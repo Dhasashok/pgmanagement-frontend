@@ -1,0 +1,1800 @@
+[
+  {
+    "id": "TC001",
+    "title": "Pay rent online from the tenant payments page",
+    "description": "A tenant can review the pending dues, start an online payment, and see the payment completed state after returning to the app.",
+    "category": "Tenant Rent Payment and Invoicing",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the tenant rent payments page"
+      },
+      {
+        "type": "action",
+        "description": "Start the online payment flow for the pending rent"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the rent payment is marked as completed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Sign in and reach the correct dashboard as an owner",
+    "description": "This verifies that an owner can sign in successfully and is routed to the owner portal.",
+    "category": "User Authentication & Role Navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the owner dashboard is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Sign in and reach the correct dashboard as a tenant",
+    "description": "This verifies that a tenant can sign in successfully and is routed to the tenant portal.",
+    "category": "User Authentication & Role Navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the tenant dashboard is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Approve a submitted payment proof",
+    "description": "This verifies that an owner can review a manual payment proof and approve it from the verification queue.",
+    "category": "Owner Payment Verification Queue",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the payment verification page"
+      },
+      {
+        "type": "action",
+        "description": "Open a submitted payment proof"
+      },
+      {
+        "type": "action",
+        "description": "Approve the payment proof"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the proof status is updated to approved"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Submit manual payment proof for rent",
+    "description": "This verifies that a tenant can upload a manual payment proof and submit it for verification.",
+    "category": "Tenant Rent Payment",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the rent payments page"
+      },
+      {
+        "type": "action",
+        "description": "Upload a payment proof image"
+      },
+      {
+        "type": "action",
+        "description": "Submit the payment proof"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a proof submission confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Submit manual payment proof for verification",
+    "description": "A tenant can upload a payment screenshot and submit it so the proof is queued for verification.",
+    "category": "Tenant Rent Payment and Invoicing",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the tenant rent payments page"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid payment proof image"
+      },
+      {
+        "type": "action",
+        "description": "Submit the payment proof for verification"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the proof submission confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Submit a maintenance complaint",
+    "description": "A tenant can create a maintenance complaint with the required details and see it appear in the complaint tracker.",
+    "category": "Tenant Complaints Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the tenant email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the tenant password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /tenant/complaints"
+      },
+      {
+        "type": "action",
+        "description": "Start a new complaint"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the complaint category field with Maintenance"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the complaint title field with Water leak in bathroom"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the complaint description field with water dripping from the bathroom ceiling"
+      },
+      {
+        "type": "action",
+        "description": "Submit the complaint"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the complaint appears in the live status tracker"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Reject a submitted payment proof with a review outcome",
+    "description": "This verifies that an owner can reject a manual payment proof from the verification queue and see the rejection outcome.",
+    "category": "Owner Payment Verification Queue",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the payment verification page"
+      },
+      {
+        "type": "action",
+        "description": "Open a submitted payment proof"
+      },
+      {
+        "type": "action",
+        "description": "Reject the payment proof"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the proof status is updated to rejected"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Reject a submitted payment proof",
+    "description": "This verifies that an owner can open a submitted payment proof and reject it, resulting in the proof moving to a rejected state.",
+    "category": "Payment Verification Queue",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /owner/payment-verification"
+      },
+      {
+        "type": "action",
+        "description": "Open a submitted payment proof entry"
+      },
+      {
+        "type": "action",
+        "description": "Reject the selected payment proof"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the proof is marked as rejected"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Return to the correct portal after refreshing the session",
+    "description": "This verifies that a signed-in user remains authenticated and lands on the correct role-based portal after a page reload.",
+    "category": "User Authentication & Role Navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Refresh the page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user remains on the correct dashboard"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Update complaint status",
+    "description": "An owner can open a tenant complaint and move it to an updated resolution status.",
+    "category": "Owner Complaints Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /owner/complaints"
+      },
+      {
+        "type": "action",
+        "description": "Open a complaint ticket"
+      },
+      {
+        "type": "action",
+        "description": "Update the complaint status"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the complaint reflects the updated status"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Record an offline rent payment",
+    "description": "This verifies that an owner can mark a tenant's rent as paid through an offline payment entry.",
+    "category": "Owner Rent Management and Offline Payment Recording",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the rent management page"
+      },
+      {
+        "type": "action",
+        "description": "Record an offline payment"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the offline payment entry is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Review payment proofs queue",
+    "description": "This verifies that an owner can view the payment verification queue and see submitted proofs available for review.",
+    "category": "Payment Verification Queue",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /owner/payment-verification"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify submitted payment proofs are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Track complaint status after submission",
+    "description": "A tenant can return to the complaints page and confirm the submitted issue is shown with a live status.",
+    "category": "Tenant Complaints and Status Tracking",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open tenant complaints"
+      },
+      {
+        "type": "action",
+        "description": "Open the most recent complaint entry"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the complaint status is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Track an existing complaint status",
+    "description": "A tenant can open an existing complaint and see its current resolution status.",
+    "category": "Tenant Complaints Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the tenant email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the tenant password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /tenant/complaints"
+      },
+      {
+        "type": "action",
+        "description": "Review an existing complaint"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the complaint status tracker is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the current resolution status is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC016",
+    "title": "Generate monthly rent records and track overdue entries",
+    "description": "This verifies that an owner can generate rent records and view overdue tracking on the rent management page.",
+    "category": "Owner Rent Management and Offline Payment Recording",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the rent management page"
+      },
+      {
+        "type": "action",
+        "description": "Generate monthly rent records"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify rent records and overdue tracking are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC017",
+    "title": "Onboard a new tenant and assign a bed",
+    "description": "Owner creates a tenant record, assigns a bed, and sees the new tenant saved in the management list.",
+    "category": "Owner Tenant Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the tenant management navigation link"
+      },
+      {
+        "type": "action",
+        "description": "Open the new tenant onboarding form"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the tenant details with valid information"
+      },
+      {
+        "type": "action",
+        "description": "Assign a bed to the tenant"
+      },
+      {
+        "type": "action",
+        "description": "Save the tenant record"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new tenant appears in the tenant list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC018",
+    "title": "Inspect room availability across floors and sharing types",
+    "description": "This verifies that an owner can filter the room grid and inspect bed availability across the building.",
+    "category": "Owner Room Availability Grid",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the room availability page"
+      },
+      {
+        "type": "action",
+        "description": "Filter rooms by floor or sharing type"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the bed availability grid is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC019",
+    "title": "Publish an announcement",
+    "description": "An owner can create and publish a new announcement for tenants to read.",
+    "category": "Owner Announcements",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /owner/announcements"
+      },
+      {
+        "type": "action",
+        "description": "Create a new announcement"
+      },
+      {
+        "type": "action",
+        "description": "Add priority details to the announcement"
+      },
+      {
+        "type": "action",
+        "description": "Publish the announcement"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new announcement is visible in the list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC020",
+    "title": "Generate monthly rent records",
+    "description": "Owner generates rent records from the rent management page and sees the rent list update with new invoice entries.",
+    "category": "Owner Rent Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the rent management navigation link"
+      },
+      {
+        "type": "action",
+        "description": "Generate rent records for the current month"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify updated rent invoice entries are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC021",
+    "title": "View current assignment and dues from the tenant dashboard",
+    "description": "A tenant can open the dashboard and confirm their assigned bed, current rent due, and summary information are visible.",
+    "category": "Tenant Dashboard and Room Details",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the tenant dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the assigned bed and current rent due summary are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC022",
+    "title": "Use demo access to enter the matching portal",
+    "description": "This verifies that a user can use the demo access path and reach the correct dashboard for the selected role.",
+    "category": "User Authentication & Role Navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Enable demo access"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the matching dashboard is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC023",
+    "title": "Inspect a specific bed assignment from the availability grid",
+    "description": "This verifies that an owner can select a bed and view its current tenant assignment details.",
+    "category": "Owner Room Availability Grid",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the room availability page"
+      },
+      {
+        "type": "action",
+        "description": "Select a bed from the grid"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the bed assignment details are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC024",
+    "title": "View assigned room details as a tenant",
+    "description": "This verifies that a signed-in tenant can open the room view and see their assigned room information.",
+    "category": "Tenant Dashboard and Room Details",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the room details page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the assigned room information is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC025",
+    "title": "Review complaint details before updating",
+    "description": "An owner can open a complaint and view its details before taking action.",
+    "category": "Owner Complaints Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /owner/complaints"
+      },
+      {
+        "type": "action",
+        "description": "Open a complaint ticket"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the complaint details are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC026",
+    "title": "Process a tenant checkout from the tenant list",
+    "description": "This verifies that an owner can complete a tenant checkout workflow and preserve the vacancy outcome.",
+    "category": "Owner Tenant Management Onboarding and Bed Assignment",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the tenants page"
+      },
+      {
+        "type": "action",
+        "description": "Select an active tenant record"
+      },
+      {
+        "type": "action",
+        "description": "Process the checkout"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the tenant record is updated to reflect checkout"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC027",
+    "title": "Update a tenant bed assignment",
+    "description": "Owner searches for an existing resident, changes the bed assignment or pre-booking status, and sees the updated tenant record.",
+    "category": "Owner Tenant Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the tenant management navigation link"
+      },
+      {
+        "type": "action",
+        "description": "Search for a resident"
+      },
+      {
+        "type": "action",
+        "description": "Update the bed assignment or pre-booking status"
+      },
+      {
+        "type": "action",
+        "description": "Save the change"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the tenant record reflects the updated assignment"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC028",
+    "title": "Review payment history and receipt access",
+    "description": "This verifies that a tenant can view past rent payments and access receipt download actions from the payment history page.",
+    "category": "Tenant Payment History and Receipt Download",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the payment history page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify past payments and receipt actions are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC029",
+    "title": "Save property settings",
+    "description": "An owner can update property configuration and save the changes successfully.",
+    "category": "Owner Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /owner/settings"
+      },
+      {
+        "type": "action",
+        "description": "Update the rent due day"
+      },
+      {
+        "type": "action",
+        "description": "Update the payment details"
+      },
+      {
+        "type": "action",
+        "description": "Save the settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated settings are saved"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC030",
+    "title": "Update tenant contact information",
+    "description": "A tenant can change contact details or emergency phone numbers and save the profile successfully.",
+    "category": "Tenant Profile Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the tenant email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the tenant password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /tenant/profile"
+      },
+      {
+        "type": "action",
+        "description": "Update contact information or emergency phone numbers"
+      },
+      {
+        "type": "action",
+        "description": "Save the profile changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated profile details are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC031",
+    "title": "Save property and rent settings successfully",
+    "description": "This verifies that an owner can update property details, due day, and payment information in settings.",
+    "category": "Owner Settings Save Property, Rent Due Day, UPI QR, and Bank Details",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the settings page"
+      },
+      {
+        "type": "action",
+        "description": "Update the property and payment details"
+      },
+      {
+        "type": "action",
+        "description": "Save the settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated settings are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC032",
+    "title": "Open room details from the tenant portal",
+    "description": "A tenant can open the room details page and review their room, floor, roommates, and amenities.",
+    "category": "Tenant Dashboard and Room Details",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the tenant room details page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the room number, floor, roommates, and amenities are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC033",
+    "title": "Review current dues and use tenant quick actions",
+    "description": "This verifies that a tenant can see their current rent status on the dashboard and access the main payment action.",
+    "category": "Tenant Dashboard and Room Details",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify current dues and quick actions are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC034",
+    "title": "View the building inventory",
+    "description": "Owner opens building management and sees the current floor, room, and bed inventory displayed.",
+    "category": "Owner Building Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the building management navigation link"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify floor, room, and bed inventory are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC035",
+    "title": "Publish a new announcement and make it visible",
+    "description": "This verifies that an owner can create and publish a community announcement successfully.",
+    "category": "Owner Announcements Publish and Delete",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the announcements manager"
+      },
+      {
+        "type": "action",
+        "description": "Create a new announcement"
+      },
+      {
+        "type": "action",
+        "description": "Publish the announcement"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the published announcement is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC036",
+    "title": "See open complaints list",
+    "description": "An owner can view the complaints board and see complaints available for review.",
+    "category": "Owner Complaints Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /owner/complaints"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify complaints are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC037",
+    "title": "Complete tenant checkout and archive the stay",
+    "description": "Owner processes checkout for a vacating tenant and sees the stay moved into the archived history.",
+    "category": "Owner Tenant Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the tenant management navigation link"
+      },
+      {
+        "type": "action",
+        "description": "Select a vacating tenant"
+      },
+      {
+        "type": "action",
+        "description": "Complete checkout processing"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the stay record is archived"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC038",
+    "title": "Complete a tenant registration with document details",
+    "description": "This verifies that a new tenant can fill out the registration form, provide required details, and submit successfully.",
+    "category": "Public Landing Page and Registration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the registration details"
+      },
+      {
+        "type": "action",
+        "description": "Upload the required identity document"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a registration confirmation is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC039",
+    "title": "Update the building layout",
+    "description": "Owner changes the building structure or sharing configuration and saves the revised layout successfully.",
+    "category": "Owner Building Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the building management navigation link"
+      },
+      {
+        "type": "action",
+        "description": "Update the building structure"
+      },
+      {
+        "type": "action",
+        "description": "Update the sharing configuration"
+      },
+      {
+        "type": "action",
+        "description": "Save the revised layout"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the saved building layout is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC040",
+    "title": "Review payment history and download a receipt",
+    "description": "A tenant can open payment history, inspect past transactions, and download an official receipt for one of them.",
+    "category": "Tenant Payment History",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open payment history"
+      },
+      {
+        "type": "action",
+        "description": "Open a receipt for one payment entry"
+      },
+      {
+        "type": "action",
+        "description": "Download the official receipt"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify past payment entries and receipt access are available"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC041",
+    "title": "View financial dashboard metrics and rent breakdowns",
+    "description": "This verifies that an owner can open the financial dashboard and review revenue and collection metrics.",
+    "category": "Owner Occupancy Analytics and Financial Dashboard Charts",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the financial dashboard page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify financial metrics and rent breakdowns are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC042",
+    "title": "Update payment configuration details",
+    "description": "An owner can change UPI and bank details and keep the updated payment configuration.",
+    "category": "Owner Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /owner/settings"
+      },
+      {
+        "type": "action",
+        "description": "Update the UPI QR code"
+      },
+      {
+        "type": "action",
+        "description": "Update the bank details"
+      },
+      {
+        "type": "action",
+        "description": "Save the settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the payment configuration is saved"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC043",
+    "title": "View occupancy analytics charts",
+    "description": "This verifies that an owner can open the analytics page and view occupancy trend data.",
+    "category": "Owner Occupancy Analytics and Financial Dashboard Charts",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the occupancy analytics page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify occupancy analytics charts are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC044",
+    "title": "Search the tenant history archive",
+    "description": "This verifies that an owner can search the tenant history archive and see matching previous tenant records.",
+    "category": "Owner Tenant History Archive",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /owner/tenant-history"
+      },
+      {
+        "type": "action",
+        "description": "Search the archive for a previous tenant"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify matching tenant records are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC045",
+    "title": "Review a previous tenant stay record",
+    "description": "This verifies that an owner can open a past tenant record and see stay dates and deposit refund information.",
+    "category": "Owner Tenant History Archive",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /owner/tenant-history"
+      },
+      {
+        "type": "action",
+        "description": "Open a previous tenant record"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify stay dates are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify deposit refund information is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC046",
+    "title": "Read a tenant announcement",
+    "description": "A tenant can browse the notice board and open an announcement to read its full message.",
+    "category": "Tenant Announcements",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the tenant email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the tenant password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /tenant/announcements"
+      },
+      {
+        "type": "action",
+        "description": "Review the notice board"
+      },
+      {
+        "type": "action",
+        "description": "Open an announcement to read the full message"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the announcement content is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC047",
+    "title": "Review archived tenant history records",
+    "description": "This verifies that an owner can search or browse past tenant records in the history archive.",
+    "category": "Owner Tenant History Archive",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the tenant history page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify archived tenant records are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC048",
+    "title": "Delete an outdated announcement",
+    "description": "An owner can remove an outdated announcement from the announcements list.",
+    "category": "Owner Announcements",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /owner/announcements"
+      },
+      {
+        "type": "action",
+        "description": "Delete an outdated announcement"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the deleted announcement is no longer visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC049",
+    "title": "Review financial performance dashboard",
+    "description": "This verifies that an owner can open the financial dashboard and review revenue trends and collection breakdowns.",
+    "category": "Owner Occupancy and Financial Analytics",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /owner/financial-dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify revenue trend data is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify rent collection breakdowns are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC050",
+    "title": "Explore the public landing page and continue to sign in or register",
+    "description": "This verifies that a guest visitor can review the public landing page and navigate to account access or registration.",
+    "category": "Public Landing Page and Registration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll through the landing page content"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify property highlights and access options are displayed"
+      }
+    ],
+    "priority": "Medium"
+  }
+]
