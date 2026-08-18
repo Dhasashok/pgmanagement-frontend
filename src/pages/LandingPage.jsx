@@ -209,36 +209,29 @@ export const LandingPage = () => {
         id="about"
         className="relative min-h-[88vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden pt-20 pb-16"
       >
-        {/* Full-width Background Video Layer */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-20">
+        {/* Full-width Background Video Layer (z-0 so it is above background) */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
           <video
             ref={videoRef}
+            src="https://vjs.zencdn.net/v/oceans.mp4"
             autoPlay
             loop
             muted
             playsInline
             preload="auto"
             poster="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1600&q=80"
-            className="w-full h-full object-cover scale-105 transition-transform duration-1000 opacity-75"
+            className="w-full h-full object-cover opacity-85"
             aria-hidden="true"
           >
-            {/* Primary Expected Local Video Asset */}
             <source src="/videos/pg-hero.mp4" type="video/mp4" />
-            {/* Direct High-Reliability Video Stream Fallback */}
             <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
-            {/* Graceful Fallback Static Bedroom Image */}
-            <img
-              src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1600&q=80"
-              alt="Royal Orchid PG Bedroom"
-              className="w-full h-full object-cover"
-            />
           </video>
         </div>
 
-        {/* Multi-tier Dark Transparent Gradient Overlay for Optimal Text Readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/45 -z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-transparent to-slate-950/60 -z-10" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none -z-10" />
+        {/* Multi-tier Dark Transparent Gradient Overlay (z-[1]) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/30 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-transparent to-slate-950/60 z-[1]" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none z-[1]" />
 
         {/* Centered Hero Content */}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 my-auto py-8">
