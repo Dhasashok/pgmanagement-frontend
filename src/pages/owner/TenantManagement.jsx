@@ -707,34 +707,46 @@ export const TenantManagement = () => {
         isOpen={detailModalOpen}
         onClose={() => setDetailModalOpen(false)}
         title={selectedTenant?.full_name || 'Resident Details'}
-        subtitle={`ID: ${selectedTenant?.id} • Move-in: ${selectedTenant?.joining_date || 'Not set'}`}
+        subtitle={`ID: ${selectedTenant?.id || ''} • Joined: ${selectedTenant?.joining_date || 'Not set'}`}
         maxWidth="max-w-3xl"
       >
         {selectedTenant && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Top Identity Card */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60">
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 p-4 sm:p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60">
+              <div className="flex items-center gap-3.5 min-w-0">
                 <img
                   src={getAssetUrl(selectedTenant.profile_photo_url) || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
                   alt={selectedTenant.full_name}
-                  className="w-16 h-16 rounded-2xl object-cover ring-2 ring-indigo-500/50"
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover ring-2 ring-indigo-500/50 shrink-0"
                 />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-extrabold text-white">{selectedTenant.full_name}</h3>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-base sm:text-lg font-extrabold text-white truncate">{selectedTenant.full_name}</h3>
                     <Badge variant={selectedTenant.status}>{selectedTenant.status}</Badge>
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-slate-400 mt-2">
-                    <span className="text-indigo-300 font-semibold">{selectedTenant.mobile_number}</span>
-                  </div>
+                  <p className="text-xs text-indigo-300 font-semibold mt-1">
+                    {selectedTenant.mobile_number}
+                  </p>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2">
-                <button onClick={openEditProfile} className="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 rounded-xl text-xs font-bold transition flex items-center gap-1.5"><Edit2 className="w-3.5 h-3.5" /> Edit Profile</button>
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto pt-2 sm:pt-0">
+                <button
+                  onClick={openEditProfile}
+                  className="flex-1 sm:flex-initial px-3.5 py-2 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                  <span>Edit Profile</span>
+                </button>
                 {selectedTenant.status === 'active' && (
-                  <button onClick={() => setCheckoutModalOpen(true)} className="px-4 py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 rounded-xl text-xs font-bold transition flex items-center gap-1.5"><LogOut className="w-3.5 h-3.5" /> Check Out Resident</button>
+                  <button
+                    onClick={() => setCheckoutModalOpen(true)}
+                    className="flex-1 sm:flex-initial px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Check Out Resident</span>
+                  </button>
                 )}
               </div>
             </div>

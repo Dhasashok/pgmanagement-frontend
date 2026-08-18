@@ -318,19 +318,22 @@ export const TenantProfile = () => {
         onClose={() => setPhotoModalOpen(false)}
         title="Update Profile Photo"
         subtitle="Upload an image file or choose an avatar"
+        maxWidth="max-w-md"
       >
-        <div className="space-y-4">
-          <div className="flex flex-col items-center justify-center p-4 bg-slate-800/60 rounded-2xl border border-slate-700/60">
+        <div className="space-y-3.5">
+          <div className="flex items-center justify-center gap-3.5 p-3 bg-slate-800/60 rounded-2xl border border-slate-700/60">
             <img
               src={photoUrlInput || currentAvatar}
               alt="Preview"
-              className="w-24 h-24 rounded-3xl object-cover ring-2 ring-indigo-500 shadow-xl mb-3"
+              className="w-16 h-16 rounded-2xl object-cover ring-2 ring-indigo-500 shadow-md shrink-0"
             />
-            <p className="text-xs text-slate-400">Current Photo Preview</p>
+            <div className="text-left">
+              <p className="text-xs font-bold text-white">Active Photo Preview</p>
+              <p className="text-[11px] text-slate-400">Choose a new file or preset below</p>
+            </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Upload Photo File</label>
             <input
               type="file"
               ref={fileInputRef}
@@ -341,14 +344,14 @@ export const TenantProfile = () => {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold border border-slate-700 transition flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold border border-slate-700 transition flex items-center justify-center gap-2 shadow-sm"
             >
               <Upload className="w-4 h-4 text-indigo-400" />
               <span>Choose Image File (JPG / PNG)</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <div className="flex-1 h-px bg-slate-800" />
             <span className="text-[10px] uppercase font-bold text-slate-500">Or avatar presets</span>
             <div className="flex-1 h-px bg-slate-800" />
@@ -366,19 +369,19 @@ export const TenantProfile = () => {
                 type="button"
                 onClick={() => setPhotoUrlInput(img)}
                 className={`rounded-xl overflow-hidden border-2 p-0.5 transition ${
-                  photoUrlInput === img ? 'border-indigo-500 ring-2 ring-indigo-500/50' : 'border-slate-700'
+                  photoUrlInput === img ? 'border-indigo-500 ring-2 ring-indigo-500/50' : 'border-slate-700 hover:border-slate-600'
                 }`}
               >
-                <img src={img} alt="preset" className="w-full h-14 rounded-lg object-cover" />
+                <img src={img} alt="preset" className="w-full h-11 sm:h-12 rounded-lg object-cover" />
               </button>
             ))}
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
+          <div className="flex justify-end gap-2.5 pt-3 border-t border-slate-800">
             <button
               type="button"
               onClick={() => setPhotoModalOpen(false)}
-              className="px-4 py-2 bg-slate-800 rounded-xl text-xs font-bold text-slate-300"
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-300 transition"
             >
               Cancel
             </button>
@@ -386,9 +389,9 @@ export const TenantProfile = () => {
               type="button"
               disabled={uploadingPhoto}
               onClick={() => updatePhoto(photoUrlInput)}
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold shadow-lg"
+              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/30 transition disabled:opacity-50"
             >
-              {uploadingPhoto ? 'Updating...' : 'Save Photo'}
+              {uploadingPhoto ? 'Saving...' : 'Save Photo'}
             </button>
           </div>
         </div>

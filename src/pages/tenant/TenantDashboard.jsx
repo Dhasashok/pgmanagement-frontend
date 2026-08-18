@@ -14,7 +14,9 @@ import {
   ShieldCheck,
   Sparkles,
   Phone,
-  Clock
+  Clock,
+  BedDouble,
+  Building
 } from 'lucide-react';
 import { Badge } from '../../components/common/Badge';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
@@ -69,36 +71,48 @@ export const TenantDashboard = () => {
   const formatCurrency = (val) => `₹${Number(val || 0).toLocaleString('en-IN')}`;
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Welcome Banner */}
-      <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 relative overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
-          <div className="flex items-center gap-4">
+    <div className="space-y-6 max-w-6xl mx-auto">
+      {/* Modern, Highly Responsive Welcome Banner */}
+      <div className="glass-card p-5 sm:p-7 rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 relative overflow-hidden shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
+          {/* User Identity & Avatar */}
+          <div className="flex items-center gap-3.5 sm:gap-4">
             <img
               src={user?.avatar_url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'}
               alt={user?.name}
-              className="w-16 h-16 rounded-2xl object-cover ring-2 ring-indigo-500/50 shrink-0"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover ring-2 ring-indigo-500/40 shrink-0 shadow-md"
             />
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-extrabold text-white tracking-tight">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-lg sm:text-2xl font-black text-white tracking-tight truncate">
                   Welcome back, {user?.name}!
                 </h1>
                 <Badge variant="active">Active Resident</Badge>
               </div>
-              <p className="text-xs text-slate-400 mt-1">
-                {property?.name || 'Royal Orchid PG'} • Resident ID: {tenantProfile?.id || 'TNT-001'}
+              <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                <span>{property?.name || 'Royal Orchid PG'}</span>
+                <span>•</span>
+                <span className="font-mono text-slate-400">ID: {tenantProfile?.id || 'tnt-001'}</span>
               </p>
             </div>
           </div>
 
-          {/* Location Badge */}
-          <div className="px-5 py-3 rounded-2xl bg-indigo-950/80 border border-indigo-500/30 text-right self-start sm:self-auto">
-            <span className="text-[10px] uppercase font-bold text-indigo-300 block">Assigned Stay</span>
-            <span className="text-sm font-extrabold text-white block">
-              Floor {tenantProfile?.floor_number || 1} • Room {tenantProfile?.room_number || '101'}
-            </span>
-            <span className="text-xs font-bold text-indigo-400 block">{tenantProfile?.bed_number || 'BED 01'}</span>
+          {/* Assigned Stay Pill */}
+          <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-indigo-950/70 border border-indigo-500/30 shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+              <BedDouble className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-300 block">Assigned Stay</span>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-xs sm:text-sm font-bold text-white">
+                  Floor {tenantProfile?.floor_number || 1} • Room {tenantProfile?.room_number || '101'}
+                </span>
+                <span className="text-[11px] font-extrabold text-indigo-400 bg-indigo-500/20 px-1.5 py-0.5 rounded">
+                  {tenantProfile?.bed_number || 'BED 01'}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -106,7 +120,7 @@ export const TenantDashboard = () => {
       {/* Main Grid: Rent Status & Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Rent Dues Highlight Box (7 cols) */}
-        <div className="lg:col-span-7 glass-card p-6 rounded-3xl border border-slate-800 space-y-6 flex flex-col justify-between">
+        <div className="lg:col-span-7 glass-card p-5 sm:p-6 rounded-3xl border border-slate-800 space-y-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-4 border-b border-slate-800">
               <div className="flex items-center gap-2.5">
@@ -122,7 +136,7 @@ export const TenantDashboard = () => {
               <Badge variant={currentRent?.status || 'pending'}>{currentRent?.status || 'pending'}</Badge>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-4">
+            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/60">
                 <span className="text-slate-400 text-[11px] block mb-1">Monthly Tariff</span>
                 <span className="text-2xl font-black text-white">{formatCurrency(currentRent?.total_amount || tenantProfile?.monthly_rent || 6000)}</span>
@@ -134,14 +148,14 @@ export const TenantDashboard = () => {
                 <span className="text-lg font-bold text-amber-300">
                   {currentRent?.due_date ? new Date(currentRent.due_date).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : '5th of Month'}
                 </span>
-                <span className="text-[10px] text-slate-400 block mt-1">Due in 5th of every month</span>
+                <span className="text-[10px] text-slate-400 block mt-1">Due on 5th of every month</span>
               </div>
             </div>
           </div>
 
           <div className="pt-4 border-t border-slate-800">
             {isPaid ? (
-              <div className="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 flex items-center justify-between">
+              <div className="p-3.5 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   <span>Rent Cleared for this Month</span>
@@ -154,7 +168,7 @@ export const TenantDashboard = () => {
                 </button>
               </div>
             ) : isPendingVerification ? (
-              <div className="p-4 rounded-2xl bg-purple-950/30 border border-purple-500/30 flex items-center justify-between">
+              <div className="p-3.5 rounded-2xl bg-purple-950/30 border border-purple-500/30 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-bold text-purple-300">
                   <Clock className="w-4 h-4 animate-spin text-purple-400" />
                   <span>Payment proof under review by Owner</span>
@@ -179,9 +193,9 @@ export const TenantDashboard = () => {
         </div>
 
         {/* Roommates & Quick Actions (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className="lg:col-span-5 space-y-5">
           {/* Roommates Card */}
-          <div className="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+          <div className="glass-card p-5 sm:p-6 rounded-3xl border border-slate-800 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-extrabold text-white flex items-center gap-2">
                 <Users className="w-4 h-4 text-indigo-400" />
@@ -200,7 +214,14 @@ export const TenantDashboard = () => {
                 <p className="text-xs text-slate-500 text-center py-4">No other roommates in this room.</p>
               ) : (
                 tenantProfile.roommates.map((rm) => (
-                  <div key={rm.id} role="button" tabIndex={0} onClick={() => navigate('/tenant/room')} onKeyDown={(event) => event.key === 'Enter' && navigate('/tenant/room')} className="p-3 rounded-2xl bg-slate-800/40 border border-slate-800 flex items-center justify-between cursor-pointer hover:border-indigo-500/50 transition">
+                  <div
+                    key={rm.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => navigate('/tenant/room')}
+                    onKeyDown={(event) => event.key === 'Enter' && navigate('/tenant/room')}
+                    className="p-3 rounded-2xl bg-slate-800/40 border border-slate-800 flex items-center justify-between cursor-pointer hover:border-indigo-500/50 transition"
+                  >
                     <div className="flex items-center gap-2.5">
                       <img
                         src={rm.profile_photo_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80'}
@@ -221,15 +242,15 @@ export const TenantDashboard = () => {
             </div>
           </div>
 
-          {/* Quick Help / Maintenance Request */}
-          <div className="p-5 rounded-3xl bg-gradient-to-br from-indigo-950/40 to-slate-900 border border-indigo-500/30 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <h4 className="text-xs font-extrabold text-white">Need Quick Repairs?</h4>
-              <p className="text-[11px] text-slate-400">Wi-Fi, plumbing, cleaning, or electrical help.</p>
+          {/* Quick Help / Maintenance Request - Responsive Clean Layout */}
+          <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-indigo-950/40 to-slate-900 border border-indigo-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-0.5 min-w-0">
+              <h4 className="text-xs sm:text-sm font-extrabold text-white">Need Quick Repairs?</h4>
+              <p className="text-[11px] text-slate-400 leading-snug">Wi-Fi, plumbing, cleaning, or electrical help.</p>
             </div>
             <button
               onClick={() => navigate('/tenant/complaints')}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition shrink-0 self-start sm:self-auto"
             >
               Raise Request
             </button>
