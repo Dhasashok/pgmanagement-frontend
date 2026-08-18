@@ -8,7 +8,8 @@ import {
   BedDouble,
   CheckCircle2,
   Sparkles,
-  MessageSquare
+  MessageSquare,
+  Calendar
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
@@ -542,25 +543,56 @@ export const RegisterPage = () => {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-4"
             >
-              {/* Move-in Date Picker */}
-              <div className="p-3.5 bg-slate-900/80 border border-slate-800 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                <span className="text-xs font-bold text-white">Move-in Date</span>
-                <div className="flex items-center gap-2">
+              {/* Booking Type: Immediate Move-In vs Pre-Book Toggle */}
+              <div className="p-3.5 bg-slate-900/80 border border-slate-800 rounded-2xl space-y-2.5">
+                <label className="block text-xs font-semibold text-slate-300">Booking Type</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, joining_date: today })}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${!isPreBooking ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border ${
+                      !isPreBooking
+                        ? 'bg-emerald-600 border-emerald-500 text-white shadow-md'
+                        : 'bg-slate-800/80 border-slate-700/80 text-slate-300 hover:bg-slate-700'
+                    }`}
                   >
-                    Today
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Immediate Move-In (Today)</span>
                   </button>
-                  <input
-                    type="date"
-                    min={today}
-                    value={formData.joining_date}
-                    onChange={(e) => setFormData({ ...formData, joining_date: e.target.value })}
-                    className="px-2.5 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500"
-                  />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!isPreBooking) {
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        setFormData({ ...formData, joining_date: tomorrow.toISOString().split('T')[0] });
+                      }
+                    }}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border ${
+                      isPreBooking
+                        ? 'bg-indigo-600 border-indigo-500 text-white shadow-md'
+                        : 'bg-slate-800/80 border-slate-700/80 text-slate-300 hover:bg-slate-700'
+                    }`}
+                  >
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>Pre-Book for Later</span>
+                  </button>
                 </div>
+
+                {/* If Pre-Booking selected, show calendar date selector */}
+                {isPreBooking && (
+                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-3">
+                    <span className="text-[11px] text-indigo-300 font-medium">Select Move-In Date:</span>
+                    <input
+                      type="date"
+                      min={today}
+                      value={formData.joining_date}
+                      onChange={(e) => setFormData({ ...formData, joining_date: e.target.value })}
+                      className="px-3 py-1.5 bg-slate-800 border border-indigo-500/50 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-400"
+                    />
+                  </div>
+                )}
               </div>
 
               {loadingHierarchy ? (
