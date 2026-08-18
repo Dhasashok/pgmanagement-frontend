@@ -14,7 +14,7 @@ import {
   Pie,
   Cell
 } from 'recharts';
-import { DollarSign, TrendingUp, CreditCard, AlertTriangle, CheckCircle, PieChart as PieIcon } from 'lucide-react';
+import { DollarSign, TrendingUp, CreditCard, AlertTriangle } from 'lucide-react';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { StatCard } from '../../components/common/StatCard';
 import api from '../../services/api';
@@ -46,7 +46,7 @@ export const FinancialDashboard = () => {
   }, []);
 
   if (loading) {
-    return <LoadingSpinner label="Compiling monthly financial intelligence..." />;
+    return <LoadingSpinner label="Loading financial analytics..." />;
   }
 
   const formatCurrency = (val) => `₹${Number(val || 0).toLocaleString('en-IN')}`;
@@ -58,22 +58,24 @@ export const FinancialDashboard = () => {
     bank_transfer: '#38bdf8'
   };
 
-  const methodPieData = (financeData?.paymentMethods || []).map(m => ({
-    name: m.payment_method.replace('_', ' ').toUpperCase(),
-    value: Number(m.total_amount) || 0,
-    color: paymentMethodColors[m.payment_method] || '#6366f1'
-  })).filter(m => m.value > 0);
+  const methodPieData = (financeData?.paymentMethods || [])
+    .map((m) => ({
+      name: m.payment_method.replace('_', ' ').toUpperCase(),
+      value: Number(m.total_amount) || 0,
+      color: paymentMethodColors[m.payment_method] || '#6366f1'
+    }))
+    .filter((m) => m.value > 0);
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="glass-card p-6 rounded-3xl border border-slate-800">
+      <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800">
         <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
           <DollarSign className="w-6 h-6 text-emerald-400" />
-          <span>Monthly Financial Intelligence & Revenue</span>
+          <span>Financial Analytics</span>
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Detailed revenue collection ledger, collection rates, overdue receivables, and payment channel breakdown.
+          Track monthly revenue collection, receivables, and payment channel breakdown.
         </p>
       </div>
 
@@ -89,7 +91,7 @@ export const FinancialDashboard = () => {
         <StatCard
           title="Expected Total Rent"
           value={formatCurrency(summary?.expected_rent)}
-          subtitle="Total Active Billings"
+          subtitle="Active Billings"
           icon={CreditCard}
           color="indigo"
         />
@@ -102,8 +104,8 @@ export const FinancialDashboard = () => {
         />
         <StatCard
           title="Collection Rate"
-          value={`${summary?.collection_rate || 0}%`}
-          subtitle="Target Efficiency"
+          value={`${Math.round(Number(summary?.collection_rate) || 0)}%`}
+          subtitle="Realized Efficiency"
           icon={TrendingUp}
           color="purple"
         />
@@ -112,11 +114,11 @@ export const FinancialDashboard = () => {
       {/* Main Charts: Revenue Trend & Payment Channel Donut */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Expected vs Collected Bar Chart (8 cols) */}
-        <div className="lg:col-span-8 glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+        <div className="lg:col-span-8 bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-white">Expected vs Collected Revenue (₹)</h3>
-              <p className="text-xs text-slate-400">Monthly billing vs actual realized income</p>
+              <h3 className="text-base font-bold text-white">Expected vs Collected Revenue</h3>
+              <p className="text-xs text-slate-400">Monthly billing vs actual realized collections</p>
             </div>
           </div>
 
@@ -124,9 +126,15 @@ export const FinancialDashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={financeData?.revenueTrend || []} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                 <XAxis dataKey="month" stroke="#64748b" fontSize={12} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={12} tickLine={false} tickFormatter={(v) => `₹${v/1000}k`} />
+                <YAxis stroke="#64748b" fontSize={12} tickLine={false} tickFormatter={(v) => `₹${v / 1000}k`} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: '#0f172a',
+                    borderColor: '#334155',
+                    borderRadius: '12px',
+                    color: '#fff',
+                    fontSize: '12px'
+                  }}
                   formatter={(value) => [`₹${Number(value).toLocaleString('en-IN')}`, '']}
                 />
                 <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
@@ -138,10 +146,10 @@ export const FinancialDashboard = () => {
         </div>
 
         {/* Payment Channels Donut (4 cols) */}
-        <div className="lg:col-span-4 glass-card p-6 rounded-3xl border border-slate-800 space-y-4 flex flex-col justify-between">
+        <div className="lg:col-span-4 bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4 flex flex-col justify-between">
           <div>
             <h3 className="text-base font-bold text-white">Payment Method Share</h3>
-            <p className="text-xs text-slate-400">Revenue split across channels</p>
+            <p className="text-xs text-slate-400">Revenue split across payment channels</p>
           </div>
 
           <div className="h-56 w-full relative flex items-center justify-center">
@@ -162,13 +170,19 @@ export const FinancialDashboard = () => {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                    contentStyle={{
+                      backgroundColor: '#0f172a',
+                      borderColor: '#334155',
+                      borderRadius: '12px',
+                      color: '#fff',
+                      fontSize: '12px'
+                    }}
                     formatter={(val) => [`₹${Number(val).toLocaleString('en-IN')}`, '']}
                   />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="text-xs text-slate-500">No payment data recorded</div>
+              <div className="text-xs text-slate-500">No payment records yet</div>
             )}
           </div>
 
@@ -187,10 +201,10 @@ export const FinancialDashboard = () => {
       </div>
 
       {/* Revenue Trend Area Curve */}
-      <div className="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+      <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
         <div>
-          <h3 className="text-base font-bold text-white">6-Month Collection Velocity & Inflow</h3>
-          <p className="text-xs text-slate-400">Trend of realized payments over past 6 billing cycles</p>
+          <h3 className="text-base font-bold text-white">Monthly Collection Trend</h3>
+          <p className="text-xs text-slate-400">Realized rent collections across recent billing cycles</p>
         </div>
 
         <div className="h-64 w-full pt-4">
@@ -198,14 +212,20 @@ export const FinancialDashboard = () => {
             <AreaChart data={financeData?.revenueTrend || []} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorCollected" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis dataKey="month" stroke="#64748b" fontSize={12} tickLine={false} />
-              <YAxis stroke="#64748b" fontSize={12} tickLine={false} tickFormatter={(v) => `₹${v/1000}k`} />
+              <YAxis stroke="#64748b" fontSize={12} tickLine={false} tickFormatter={(v) => `₹${v / 1000}k`} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                contentStyle={{
+                  backgroundColor: '#0f172a',
+                  borderColor: '#334155',
+                  borderRadius: '12px',
+                  color: '#fff',
+                  fontSize: '12px'
+                }}
                 formatter={(value) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Collected Income']}
               />
               <Area

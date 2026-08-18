@@ -5,12 +5,8 @@ import {
   Building,
   QrCode,
   CreditCard,
-  Phone,
-  Mail,
-  MapPin,
   Save,
-  CheckCircle,
-  Sparkles
+  CheckCircle
 } from 'lucide-react';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { useNotification } from '../../context/NotificationContext';
@@ -63,7 +59,7 @@ export const OwnerSettings = () => {
     try {
       const res = await api.put('/pg/property', formData);
       if (res.success) {
-        showSuccess('PG Property and Payment Settings saved successfully!');
+        showSuccess('Property and Payment Settings saved successfully!');
       }
     } catch (err) {
       showError(err.message || 'Failed to update settings');
@@ -73,27 +69,28 @@ export const OwnerSettings = () => {
   };
 
   if (loading) {
-    return <LoadingSpinner label="Loading PG configurations..." />;
+    return <LoadingSpinner label="Loading settings..." />;
   }
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header */}
-      <div className="glass-card p-6 rounded-3xl border border-slate-800">
+      <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800">
         <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
           <Settings className="w-6 h-6 text-indigo-400" />
-          <span>PG Configuration & Payment Settings</span>
+          <span>Property & Payment Settings</span>
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Customize PG brand identity, bank transfer information, UPI QR code, and rental terms.
+          Manage property profile, contact info, and payment QR codes.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* PG Profile */}
-        <div className="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
-          <h3 className="text-sm font-extrabold uppercase tracking-wider text-indigo-400 flex items-center gap-2 pb-2 border-b border-slate-800">
-            <Building className="w-4 h-4" /> 1. PG Brand & Property Details
+        <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
+          <h3 className="text-sm font-bold text-indigo-400 flex items-center gap-2 pb-2 border-b border-slate-800">
+            <Building className="w-4 h-4" />
+            <span>Property Details</span>
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -140,17 +137,20 @@ export const OwnerSettings = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">State / PIN</label>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">State</label>
                 <input
                   type="text"
                   required
                   value={formData.state}
                   onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                  placeholder="State"
+                  placeholder="Karnataka"
                   className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500"
                 />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">PIN Code</label>
                 <input
                   type="text"
                   required
@@ -186,14 +186,15 @@ export const OwnerSettings = () => {
         </div>
 
         {/* UPI & QR Code Settings */}
-        <div className="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
-          <h3 className="text-sm font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-2 pb-2 border-b border-slate-800">
-            <QrCode className="w-4 h-4" /> 2. UPI & QR Code Payment Configuration
+        <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
+          <h3 className="text-sm font-bold text-emerald-400 flex items-center gap-2 pb-2 border-b border-slate-800">
+            <QrCode className="w-4 h-4" />
+            <span>UPI & Payment QR Code</span>
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Primary PG UPI ID (VPA)</label>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">Primary UPI ID (VPA)</label>
               <input
                 type="text"
                 value={formData.upi_id || ''}
@@ -202,13 +203,17 @@ export const OwnerSettings = () => {
                   setFormData({
                     ...formData,
                     upi_id: val,
-                    qr_code_url: val ? `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=${val}&pn=${encodeURIComponent(formData.name || 'PG')}&cu=INR` : formData.qr_code_url
+                    qr_code_url: val
+                      ? `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=${val}&pn=${encodeURIComponent(
+                          formData.name || 'PG'
+                        )}&cu=INR`
+                      : formData.qr_code_url
                   });
                 }}
                 placeholder="e.g. royalorchid@okhdfcbank"
                 className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500"
               />
-              <p className="text-[10px] text-slate-500 mt-1">This UPI ID is displayed on tenant payment screens for instant QR scanning.</p>
+              <p className="text-[10px] text-slate-500 mt-1">Displayed on resident payment screens for QR scanning.</p>
             </div>
 
             <div>
@@ -232,7 +237,7 @@ export const OwnerSettings = () => {
               />
               <div>
                 <p className="text-xs font-bold text-white">Active Payment QR Code</p>
-                <p className="text-[11px] text-slate-400">Tenants can scan this directly using Google Pay, PhonePe, or Paytm.</p>
+                <p className="text-[11px] text-slate-400">Residents can scan this using Google Pay, PhonePe, or Paytm.</p>
                 <span className="text-[11px] text-emerald-400 font-mono font-semibold block mt-1">{formData.upi_id}</span>
               </div>
             </div>
@@ -240,9 +245,10 @@ export const OwnerSettings = () => {
         </div>
 
         {/* Bank Details & Terms */}
-        <div className="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
-          <h3 className="text-sm font-extrabold uppercase tracking-wider text-purple-400 flex items-center gap-2 pb-2 border-b border-slate-800">
-            <CreditCard className="w-4 h-4" /> 3. Bank Account & Rental Terms
+        <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
+          <h3 className="text-sm font-bold text-purple-400 flex items-center gap-2 pb-2 border-b border-slate-800">
+            <CreditCard className="w-4 h-4" />
+            <span>Bank Account & Rental Policies</span>
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -313,7 +319,7 @@ export const OwnerSettings = () => {
             className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
-            <span>{saving ? 'Saving Changes...' : 'Save Configuration'}</span>
+            <span>{saving ? 'Saving...' : 'Save Configuration'}</span>
           </button>
         </div>
       </form>

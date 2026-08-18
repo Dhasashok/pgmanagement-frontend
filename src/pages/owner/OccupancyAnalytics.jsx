@@ -46,28 +46,33 @@ export const OccupancyAnalytics = () => {
   }, []);
 
   if (loading) {
-    return <LoadingSpinner label="Calculating occupancy metrics and trends..." />;
+    return <LoadingSpinner label="Loading occupancy analytics..." />;
   }
 
-  const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e'];
+  const roundedOccupancy = Math.round(Number(summary?.occupancy_rate) || 0);
 
   const bedPieData = [
-    { name: 'Occupied', value: summary?.occupied_beds || 0, color: '#6366f1' },
-    { name: 'Available', value: summary?.available_beds || 0, color: '#10b981' },
-    { name: 'Reserved', value: summary?.reserved_beds || 0, color: '#f59e0b' },
-    { name: 'Maintenance', value: summary?.maintenance_beds || 0, color: '#f43f5e' },
-  ].filter(d => d.value > 0);
+    { name: 'Occupied', value: Number(summary?.occupied_beds) || 0, color: '#6366f1' },
+    { name: 'Vacant', value: Number(summary?.available_beds) || 0, color: '#10b981' },
+    { name: 'Reserved', value: Number(summary?.reserved_beds) || 0, color: '#f59e0b' },
+    { name: 'Maintenance', value: Number(summary?.maintenance_beds) || 0, color: '#f43f5e' }
+  ].filter((d) => d.value > 0);
+
+  // Filter out empty dummy floors with 0 beds
+  const activeFloors = (data?.floorWise || []).filter(
+    (f) => Number(f.occupied_beds) + Number(f.available_beds) > 0
+  );
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="glass-card p-6 rounded-3xl border border-slate-800">
+      <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800">
         <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
           <PieIcon className="w-6 h-6 text-indigo-400" />
-          <span>Occupancy Analytics & Forecasting</span>
+          <span>Occupancy Analytics</span>
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Detailed metrics on bed allocation, floor-wise saturation, and 6-month historical occupancy curves.
+          Overview of live capacity, bed allocation, and floor saturation.
         </p>
       </div>
 
@@ -75,8 +80,8 @@ export const OccupancyAnalytics = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard
           title="Current Occupancy"
-          value={`${summary?.occupancy_rate || 0}%`}
-          subtitle="Live Capacity Saturation"
+          value={`${roundedOccupancy}%`}
+          subtitle="Live Capacity"
           icon={TrendingUp}
           color="indigo"
         />
@@ -88,7 +93,7 @@ export const OccupancyAnalytics = () => {
           color="purple"
         />
         <StatCard
-          title="Available Beds"
+          title="Vacant Beds"
           value={summary?.available_beds || 0}
           subtitle="Ready for Allocation"
           icon={CheckCircle}
@@ -97,7 +102,7 @@ export const OccupancyAnalytics = () => {
         <StatCard
           title="Total Rooms"
           value={summary?.total_rooms || 0}
-          subtitle={`Across ${summary?.total_floors || 5} Floors`}
+          subtitle={`Across ${activeFloors.length || 2} Active Floors`}
           icon={Layers}
           color="blue"
         />
@@ -106,32 +111,46 @@ export const OccupancyAnalytics = () => {
       {/* Main Charts: Floor Wise & Bed Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Floor-wise Occupancy Bar Chart (8 cols) */}
-        <div className="lg:col-span-8 glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+        <div className="lg:col-span-8 bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-white">Floor-Wise Occupancy (Beds)</h3>
-              <p className="text-xs text-slate-400">Occupied vs Available beds per building floor</p>
+              <h3 className="text-base font-bold text-white">Floor-Wise Occupancy</h3>
+              <p className="text-xs text-slate-400">Occupied vs Vacant beds per building floor</p>
             </div>
           </div>
 
           <div className="h-72 w-full pt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data?.floorWise || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <XAxis dataKey="floor_number" stroke="#64748b" fontSize={12} tickLine={false} />
+              <BarChart data={activeFloors} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <XAxis
+                  dataKey="floor_number"
+                  stroke="#64748b"
+                  fontSize={12}
+                  tickLine={false}
+                  tickFormatter={(f) => `Floor ${f}`}
+                />
                 <YAxis stroke="#64748b" fontSize={12} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: '#0f172a',
+                    borderColor: '#334155',
+                    borderRadius: '12px',
+                    color: '#fff',
+                    fontSize: '12px'
+                  }}
+                  formatter={(val) => [`${val} Beds`, '']}
+                  labelFormatter={(lbl) => `Floor ${lbl}`}
                 />
                 <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <Bar dataKey="occupied_beds" name="Occupied Beds" fill="#6366f1" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="available_beds" name="Available Beds" fill="#10b981" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="available_beds" name="Vacant Beds" fill="#10b981" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Status Distribution Donut (4 cols) */}
-        <div className="lg:col-span-4 glass-card p-6 rounded-3xl border border-slate-800 space-y-4 flex flex-col justify-between">
+        <div className="lg:col-span-4 bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4 flex flex-col justify-between">
           <div>
             <h3 className="text-base font-bold text-white">Bed Status Breakdown</h3>
             <p className="text-xs text-slate-400">Real-time status ratio</p>
@@ -154,12 +173,19 @@ export const OccupancyAnalytics = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: '#0f172a',
+                    borderColor: '#334155',
+                    borderRadius: '12px',
+                    color: '#fff',
+                    fontSize: '12px'
+                  }}
+                  formatter={(val) => [`${val} Beds`, '']}
                 />
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-2xl font-black text-white">{summary?.occupancy_rate}%</span>
+              <span className="text-2xl font-black text-white">{roundedOccupancy}%</span>
               <span className="text-[10px] text-slate-400 uppercase font-semibold">Occupancy</span>
             </div>
           </div>
@@ -167,18 +193,18 @@ export const OccupancyAnalytics = () => {
           <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800 text-xs">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-              <span className="text-slate-300">Occupied: {summary?.occupied_beds}</span>
+              <span className="text-slate-300">Occupied: {summary?.occupied_beds || 0}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <span className="text-slate-300">Available: {summary?.available_beds}</span>
+              <span className="text-slate-300">Vacant: {summary?.available_beds || 0}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* 6-Month Occupancy Trend Curve */}
-      <div className="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+      <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
         <div>
           <h3 className="text-base font-bold text-white">6-Month Occupancy Growth Trend</h3>
           <p className="text-xs text-slate-400">Monthly occupancy rate (%) over time</p>
@@ -190,7 +216,14 @@ export const OccupancyAnalytics = () => {
               <XAxis dataKey="month" stroke="#64748b" fontSize={12} tickLine={false} />
               <YAxis domain={[50, 100]} stroke="#64748b" fontSize={12} tickLine={false} unit="%" />
               <Tooltip
-                contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                contentStyle={{
+                  backgroundColor: '#0f172a',
+                  borderColor: '#334155',
+                  borderRadius: '12px',
+                  color: '#fff',
+                  fontSize: '12px'
+                }}
+                formatter={(val) => [`${val}%`, 'Occupancy']}
               />
               <Line
                 type="monotone"
