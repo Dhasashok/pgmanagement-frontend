@@ -116,25 +116,25 @@ export const PaymentVerification = () => {
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 rounded-3xl border border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/80 p-6 rounded-3xl border border-slate-800">
         <div>
           <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-            <ShieldCheck className="w-6 h-6 text-purple-400" />
-            <span>Digital Payment Verification & Audit Engine</span>
+            <ShieldCheck className="w-6 h-6 text-indigo-400" />
+            <span>Payment Verification</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            2-Level automated UTR validation, provider matching, and instant digital receipt audit trail.
+            Review and verify offline UPI and bank payment receipts.
           </p>
         </div>
 
         {/* Status Filter Tabs */}
-        <div className="flex items-center gap-1 p-1 bg-slate-900 rounded-2xl border border-slate-800 overflow-x-auto">
+        <div className="flex items-center gap-1.5 p-1 bg-slate-900 rounded-2xl border border-slate-800 overflow-x-auto">
           {[
             { id: 'pending', label: 'Pending Review' },
-            { id: 'auto_verified', label: '⚡ Auto-Verified' },
-            { id: 'approved', label: 'Manual Approved' },
+            { id: 'auto_verified', label: 'Auto-Verified' },
+            { id: 'approved', label: 'Approved' },
             { id: 'rejected', label: 'Rejected' },
-            { id: 'audit_logs', label: '📋 Audit Logs' },
+            { id: 'audit_logs', label: 'Audit Logs' },
             { id: 'all', label: 'All Proofs' }
           ].map((tab) => (
             <button
@@ -142,7 +142,7 @@ export const PaymentVerification = () => {
               onClick={() => setStatusFilter(tab.id)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${
                 statusFilter === tab.id
-                  ? 'bg-purple-600 text-white shadow-md'
+                  ? 'bg-indigo-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -154,11 +154,11 @@ export const PaymentVerification = () => {
 
       {/* Main View: Audit Logs or Proof Cards */}
       {statusFilter === 'audit_logs' ? (
-        <div className="glass-card rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
+        <div className="bg-slate-900/80 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
           <div className="p-4 border-b border-slate-800 flex items-center justify-between">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Digital Verification Audit Trail (Level 1 & Level 2 Logs)</span>
+              <span>Verification Audit Trail</span>
             </h3>
             <span className="text-xs text-slate-400">{auditLogs.length} Records Logged</span>
           </div>
@@ -169,7 +169,7 @@ export const PaymentVerification = () => {
             <EmptyState
               icon={CheckCircle}
               title="No Audit Logs Yet"
-              description="Audit events will be logged here as residents submit and verify payments."
+              description="Audit events will be logged here as receipts are processed."
             />
           ) : (
             <div className="overflow-x-auto">
@@ -199,22 +199,20 @@ export const PaymentVerification = () => {
                         {formatCurrency(log.amount)}
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${log.level_1_status === 'passed' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}`}>
-                          {log.level_1_status}
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-bold text-[10px]">
+                          {log.validation_status || 'Passed'}
                         </span>
+                      </td>
+                      <td className="py-3 px-4 text-slate-300">
+                        {log.matched_provider || 'UPI Provider'}
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${log.level_2_status === 'verified' ? 'bg-indigo-500/20 text-indigo-300' : log.level_2_status === 'pending_manual' ? 'bg-amber-500/20 text-amber-300' : 'bg-rose-500/20 text-rose-300'}`}>
-                          {log.level_2_status}
-                        </span>
+                        <Badge variant={log.action === 'approved' ? 'paid' : log.action === 'rejected' ? 'overdue' : 'pending'}>
+                          {log.action}
+                        </Badge>
                       </td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wider ${log.final_decision === 'auto_paid' ? 'bg-emerald-500 text-slate-950 shadow-sm' : log.final_decision === 'manual_pending' ? 'bg-amber-500 text-slate-950' : 'bg-rose-600 text-white'}`}>
-                          {log.final_decision === 'auto_paid' ? '⚡ AUTO PAID' : log.final_decision}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-slate-400 text-[11px]">
-                        {new Date(log.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                      <td className="py-3 px-4 text-slate-400">
+                        {new Date(log.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </td>
                     </tr>
                   ))}
@@ -231,10 +229,10 @@ export const PaymentVerification = () => {
           <EmptyState
             icon={CheckCircle}
             celebratory={true}
-            title="🎉 All Proofs Verified!"
+            title="No Pending Payments"
             description={
               statusFilter === 'pending'
-                ? 'Zero pending offline payment proofs in queue. Great job!'
+                ? 'All offline payment receipts have been verified.'
                 : 'No payment proofs found in this view.'
             }
           />

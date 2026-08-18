@@ -211,17 +211,30 @@ export const BuildingManagement = () => {
     return <LoadingSpinner label="Loading PG building structure..." />;
   }
 
+  const formatSharing = (type) => {
+    if (!type) return 'Sharing';
+    const clean = String(type).toLowerCase().replace(/_/g, ' ');
+    if (clean.includes('single') || clean.includes('1')) return '1-Sharing';
+    if (clean.includes('double') || clean.includes('two') || clean.includes('2')) return '2-Sharing';
+    if (clean.includes('triple') || clean.includes('three') || clean.includes('3')) return '3-Sharing';
+    if (clean.includes('four') || clean.includes('4')) return '4-Sharing';
+    if (clean.includes('five') || clean.includes('5')) return '5-Sharing';
+    if (clean.includes('six') || clean.includes('6')) return '6-Sharing';
+    if (clean.includes('seven') || clean.includes('7')) return '7-Sharing';
+    return clean.replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 rounded-3xl border border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/80 p-6 rounded-3xl border border-slate-800">
         <div>
           <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
             <Building className="w-6 h-6 text-indigo-400" />
-            <span>Building, Floors & Room Configuration</span>
+            <span>Building & Rooms</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Dynamically configure building layout, add floors, setup room sharing capacities, and manage beds.
+            Manage floors, room sharing capacities, and bed inventory.
           </p>
         </div>
 
@@ -234,19 +247,20 @@ export const BuildingManagement = () => {
         </button>
       </div>
 
-      {/* Floors Accordion List */}
+      {/* Building Structure Hierarchy */}
       <div className="space-y-4">
         {hierarchy.map((floor) => {
           const isExpanded = !!expandedFloors[floor.id];
+          const cleanFloorName = floor.name ? floor.name.replace(/[-–—].*$/, '').trim() : `Floor ${floor.floor_number}`;
 
           return (
             <div
               key={floor.id}
-              className="glass-card rounded-3xl border border-slate-800 overflow-hidden transition-all shadow-lg"
+              className="bg-slate-900/80 rounded-3xl border border-slate-800 overflow-hidden transition-all shadow-lg"
             >
               {/* Floor Header */}
               <div
-                className="p-5 flex items-center justify-between bg-slate-900/80 cursor-pointer hover:bg-slate-800/60 transition"
+                className="p-5 flex items-center justify-between bg-slate-900 cursor-pointer hover:bg-slate-800/60 transition"
                 onClick={() => toggleFloor(floor.id)}
               >
                 <div className="flex items-center gap-3">
@@ -254,7 +268,7 @@ export const BuildingManagement = () => {
                     <Layers className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-base font-extrabold text-white">Floor {floor.floor_number}</h3>
+                    <h3 className="text-base font-extrabold text-white">{cleanFloorName}</h3>
                   </div>
                 </div>
 
@@ -264,7 +278,9 @@ export const BuildingManagement = () => {
                     <span>•</span>
                     <span>{floor.total_beds} Total Beds</span>
                     <span>•</span>
-                    <span className="text-red-400 font-bold">{floor.available_beds} Available</span>
+                    <span className={floor.available_beds > 0 ? 'text-emerald-400 font-bold' : 'text-slate-500'}>
+                      {floor.available_beds > 0 ? `${floor.available_beds} Vacant` : 'Fully Occupied'}
+                    </span>
                   </div>
 
                   <button
@@ -306,61 +322,76 @@ export const BuildingManagement = () => {
                     </p>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                      {floor.rooms.map((room) => (
-                        <div
-                          key={room.id}
-                          className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 relative group"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <span className="font-extrabold text-sm text-white">Room {room.room_number}</span>
-                              <span className="text-[10px] text-indigo-400 uppercase font-bold ml-2 px-1.5 py-0.5 bg-indigo-500/10 rounded">
-                                {room.room_type.replace('_', ' ')}
-                              </span>
-                            </div>
+                      {floor.rooms.map((room) => {
+                        const isFull = Number(room.available_beds) === 0;
 
-                            <button
-                              onClick={() => handleDeleteRoom(room.id)}
-                              className="text-slate-500 hover:text-rose-400 transition"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
+                        return (
+                          <div
+                            key={room.id}
+                            className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 relative group"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="font-extrabold text-sm text-white">Room {room.room_number}</span>
+                                <span className="text-[10px] text-indigo-400 font-bold px-2 py-0.5 bg-indigo-500/10 rounded-md border border-indigo-500/20">
+                                  {formatSharing(room.room_type)}
+                                </span>
+                              </div>
 
-                          <div className="flex items-center justify-between text-xs text-slate-400">
-                            <span>Rent: ₹{Number(room.base_rent).toLocaleString('en-IN')}/mo</span>
-                            <span className="text-red-400 font-semibold">{room.available_beds} of {room.total_beds} beds free</span>
-                          </div>
-
-                          {/* Mini Beds List */}
-                          <div className="pt-2 border-t border-slate-800/80 space-y-1.5">
-                            <div className="flex items-center justify-between text-[11px] text-slate-400">
-                              <span>Configured Beds ({room.beds.length}):</span>
                               <button
-                                onClick={() => openAddBed(room.id, room.base_rent, room.beds)}
-                                className="text-indigo-400 hover:text-indigo-300 font-bold text-[10px] flex items-center gap-0.5"
+                                onClick={() => handleDeleteRoom(room.id)}
+                                className="text-slate-500 hover:text-rose-400 transition"
+                                title="Delete Room"
                               >
-                                <Plus className="w-3 h-3" /> Add Bed
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
 
-                            <div className="flex flex-wrap gap-1.5">
-                              {room.beds.map((b) => (
-                                <span
-                                  key={b.id}
-                                  className={`text-[10px] px-2 py-0.5 rounded-md font-semibold border ${
-                                    b.status === 'occupied'
-                                      ? 'bg-indigo-950/60 border-indigo-500/30 text-indigo-300'
-                                      : 'bg-red-950/60 border-red-500/30 text-red-300'
-                                  }`}
-                                >
-                                  {b.bed_number} ({b.status})
+                            <div className="flex items-center justify-between text-xs text-slate-400">
+                              <span>Rent: ₹{Number(room.base_rent).toLocaleString('en-IN')}/mo</span>
+                              {isFull ? (
+                                <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
+                                  Full ({room.occupied_beds}/{room.total_beds})
                                 </span>
-                              ))}
+                              ) : (
+                                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                                  {room.available_beds} Vacant
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Mini Beds List */}
+                            <div className="pt-2 border-t border-slate-800/80 space-y-1.5">
+                              <div className="flex items-center justify-between text-[11px] text-slate-400">
+                                <span>Configured Beds ({room.beds.length}):</span>
+                                <button
+                                  onClick={() => openAddBed(room.id, room.base_rent, room.beds)}
+                                  className="text-indigo-400 hover:text-indigo-300 font-bold text-[10px] flex items-center gap-0.5"
+                                >
+                                  <Plus className="w-3 h-3" /> Add Bed
+                                </button>
+                              </div>
+
+                              <div className="flex flex-wrap gap-1.5">
+                                {room.beds.map((b) => (
+                                  <span
+                                    key={b.id}
+                                    className={`text-[10px] px-2 py-0.5 rounded-md font-semibold border ${
+                                      b.status === 'occupied'
+                                        ? 'bg-indigo-950/60 border-indigo-500/30 text-indigo-300'
+                                        : b.status === 'available'
+                                        ? 'bg-emerald-950/60 border-emerald-500/30 text-emerald-300'
+                                        : 'bg-amber-950/60 border-amber-500/30 text-amber-300'
+                                    }`}
+                                  >
+                                    {b.bed_number} ({b.status === 'available' ? 'vacant' : b.status})
+                                  </span>
+                                ))}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
