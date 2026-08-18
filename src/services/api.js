@@ -1,7 +1,13 @@
 import axios from 'axios';
 
 const isProduction = import.meta.env.PROD || (typeof window !== 'undefined' && (window.location.hostname.includes('netlify.app') || window.location.hostname.includes('vercel.app')));
-const API_BASE = import.meta.env.VITE_API_URL || (isProduction ? 'https://pgmanagement-backend-uez9.onrender.com/api' : '/api');
+
+// Auto-normalize API_BASE so it ALWAYS has the /api prefix even if the environment variable omits it
+let rawBase = import.meta.env.VITE_API_URL || (isProduction ? 'https://pgmanagement-backend-uez9.onrender.com/api' : '/api');
+if (rawBase && !rawBase.endsWith('/api') && !rawBase.endsWith('/api/')) {
+  rawBase = rawBase.replace(/\/+$/, '') + '/api';
+}
+const API_BASE = rawBase;
 
 const api = axios.create({
   baseURL: API_BASE,
