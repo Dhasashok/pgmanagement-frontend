@@ -94,7 +94,6 @@ export const LandingPage = () => {
           <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-slate-300">
             <a href="#about" className="hover:text-indigo-400 transition-colors">About</a>
             <a href="#facilities" className="hover:text-indigo-400 transition-colors">Amenities</a>
-            <a href="#tour" className="hover:text-indigo-400 transition-colors">Tour</a>
             <a href="#rules" className="hover:text-indigo-400 transition-colors">Rules</a>
             <a href="#contact" className="hover:text-indigo-400 transition-colors">Contact</a>
           </nav>
@@ -153,7 +152,6 @@ export const LandingPage = () => {
                   {[
                     { icon: Home, label: 'About', href: '#about' },
                     { icon: Sparkles, label: 'Amenities', href: '#facilities' },
-                    { icon: Compass, label: 'Virtual Tour', href: '#tour' },
                     { icon: FileText, label: 'House Rules', href: '#rules' },
                     { icon: Phone, label: 'Contact', href: '#contact' },
                   ].map((item) => {
@@ -195,16 +193,51 @@ export const LandingPage = () => {
         )}
       </AnimatePresence>
 
-      {/* Hero Section */}
-      <section id="about" className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 overflow-hidden">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-indigo-600/15 rounded-full blur-[130px] pointer-events-none -z-10" />
+      {/* Cinematic Full-Width Background Video Hero Section */}
+      <section
+        id="about"
+        className="relative min-h-[88vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden pt-20 pb-16"
+      >
+        {/* Full-width Background Video Layer */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-20">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            poster="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1600&q=80"
+            className="w-full h-full object-cover scale-105 transition-transform duration-1000 opacity-75"
+            aria-hidden="true"
+          >
+            {/* Primary Expected Local Video Asset */}
+            <source src="/videos/pg-hero.mp4" type="video/mp4" />
+            {/* Smooth Cinematic Interior Sample Fallback */}
+            <source
+              src="https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-41525-large.mp4"
+              type="video/mp4"
+            />
+            {/* Graceful Fallback Static Bedroom Image */}
+            <img
+              src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1600&q=80"
+              alt="Royal Orchid PG Bedroom"
+              className="w-full h-full object-cover"
+            />
+          </video>
+        </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        {/* Multi-tier Dark Transparent Gradient Overlay for Optimal Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/45 -z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-transparent to-slate-950/60 -z-10" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none -z-10" />
+
+        {/* Centered Hero Content */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 my-auto py-8">
           <motion.h1
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white max-w-3xl mx-auto leading-[1.15]"
+            transition={{ duration: 0.5 }}
+            className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white max-w-3xl mx-auto leading-[1.14] drop-shadow-md"
           >
             A Comfortable, Secure <br />
             <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-teal-300 bg-clip-text text-transparent">
@@ -214,80 +247,54 @@ export const LandingPage = () => {
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="mt-4 text-xs sm:text-sm md:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed"
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="mt-5 text-xs sm:text-sm md:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed drop-shadow"
           >
             Royal Orchid is a modern, tech-enabled PG in Bengaluru featuring luxury air-conditioned rooms, hygienic chef meals, 1 Gbps optical fiber Wi-Fi, and 24/7 digital support.
           </motion.p>
 
-          {/* Clean Primary CTA */}
+          {/* Primary Action Button */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="mt-6 flex items-center justify-center"
+            transition={{ duration: 0.5, delay: 0.25 }}
+            className="mt-7 flex items-center justify-center"
           >
             <Link
               to="/register"
-              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-lg shadow-indigo-600/25 transition flex items-center gap-2"
+              className="px-7 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xl shadow-indigo-600/30 transition transform hover:-translate-y-0.5 flex items-center gap-2"
             >
               <span>Explore Available Beds</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </motion.div>
 
-          {/* Clean Clean Image / Video Showcase Container */}
-          <section id="tour" className="mt-12 relative max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.25 }}
-              className="relative rounded-2xl overflow-hidden border border-slate-800 bg-slate-900 shadow-xl"
-            >
-              <div className="relative h-60 sm:h-80 md:h-[400px] w-full overflow-hidden bg-slate-950">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  poster="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80"
-                  className="w-full h-full object-cover opacity-90"
-                >
-                  <source
-                    src="https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-41525-large.mp4"
-                    type="video/mp4"
-                  />
-                  <img
-                    src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80"
-                    alt="Royal Orchid PG"
-                    className="w-full h-full object-cover"
-                  />
-                </video>
-              </div>
-            </motion.div>
-          </section>
-
           {/* Compact Quick Metrics Strip */}
-          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto">
-            <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-900/50 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+            className="mt-12 sm:mt-14 grid grid-cols-2 md:grid-cols-4 gap-3.5 max-w-4xl mx-auto"
+          >
+            <div className="p-3.5 rounded-2xl border border-slate-800/90 bg-slate-950/70 backdrop-blur-md text-center shadow-lg">
               <div className="text-xl sm:text-2xl font-black text-white">100%</div>
               <div className="text-[11px] text-slate-400 mt-0.5 font-medium">Power Backup</div>
             </div>
-            <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-900/50 text-center">
+            <div className="p-3.5 rounded-2xl border border-slate-800/90 bg-slate-950/70 backdrop-blur-md text-center shadow-lg">
               <div className="text-xl sm:text-2xl font-black text-emerald-400">24/7</div>
               <div className="text-[11px] text-slate-400 mt-0.5 font-medium">Biometric Safety</div>
             </div>
-            <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-900/50 text-center">
+            <div className="p-3.5 rounded-2xl border border-slate-800/90 bg-slate-950/70 backdrop-blur-md text-center shadow-lg">
               <div className="text-xl sm:text-2xl font-black text-indigo-400">3 Meals</div>
               <div className="text-[11px] text-slate-400 mt-0.5 font-medium">Fresh Daily Food</div>
             </div>
-            <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-900/50 text-center">
+            <div className="p-3.5 rounded-2xl border border-slate-800/90 bg-slate-950/70 backdrop-blur-md text-center shadow-lg">
               <div className="text-xl sm:text-2xl font-black text-teal-400">1 Gbps</div>
               <div className="text-[11px] text-slate-400 mt-0.5 font-medium">Fiber Wi-Fi</div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
