@@ -1,23 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Grid3X3,
-  Layers,
   BedDouble,
   Users,
-  UserCheck,
   CheckCircle2,
   AlertCircle,
   Clock,
-  Wrench,
   Search,
   UserPlus,
-  ArrowLeft,
-  ChevronRight,
+  ArrowRightLeft,
   Phone,
   Mail,
-  Shield,
-  ArrowRightLeft
+  Shield
 } from 'lucide-react';
 import { Badge } from '../../components/common/Badge';
 import { Modal } from '../../components/common/Modal';
@@ -26,7 +20,20 @@ import { useNotification } from '../../context/NotificationContext';
 import api from '../../services/api';
 
 const preferredRoom = (floor) =>
-  floor?.rooms?.find((room) => room.available_beds > 0) || floor?.rooms?.[0] || null;
+  floor?.rooms?.find((room) => Number(room.available_beds) > 0) || floor?.rooms?.[0] || null;
+
+const formatSharing = (type) => {
+  if (!type) return 'Sharing';
+  const clean = String(type).toLowerCase().replace(/_/g, ' ');
+  if (clean.includes('single') || clean.includes('1')) return '1-Sharing';
+  if (clean.includes('double') || clean.includes('two') || clean.includes('2')) return '2-Sharing';
+  if (clean.includes('triple') || clean.includes('three') || clean.includes('3')) return '3-Sharing';
+  if (clean.includes('four') || clean.includes('4')) return '4-Sharing';
+  if (clean.includes('five') || clean.includes('5')) return '5-Sharing';
+  if (clean.includes('six') || clean.includes('6')) return '6-Sharing';
+  if (clean.includes('seven') || clean.includes('7')) return '7-Sharing';
+  return clean.replace(/\b\w/g, (c) => c.toUpperCase());
+};
 
 export const RoomAvailability = () => {
   const { showSuccess, showError } = useNotification();
@@ -69,15 +76,15 @@ export const RoomAvailability = () => {
       const res = await api.get('/pg/hierarchy');
       if (res.success && res.hierarchy) {
         setHierarchy(res.hierarchy);
-        // Default to the first room with a vacant bed on the selected floor.
+        // Default to the first room with a vacant bed on the selected floor
         if (res.hierarchy.length > 0 && !selectedFloor) {
           setSelectedFloor(res.hierarchy[0]);
           if (!selectedRoom) setSelectedRoom(preferredRoom(res.hierarchy[0]));
         } else if (selectedFloor) {
-          const updatedFlr = res.hierarchy.find(f => f.id === selectedFloor.id) || res.hierarchy[0];
+          const updatedFlr = res.hierarchy.find((f) => f.id === selectedFloor.id) || res.hierarchy[0];
           setSelectedFloor(updatedFlr);
           if (selectedRoom) {
-            const updatedRm = updatedFlr.rooms.find(r => r.id === selectedRoom.id);
+            const updatedRm = updatedFlr.rooms.find((r) => r.id === selectedRoom.id);
             setSelectedRoom(updatedRm?.available_beds > 0 ? updatedRm : preferredRoom(updatedFlr));
           } else {
             setSelectedRoom(preferredRoom(updatedFlr));
@@ -100,7 +107,6 @@ export const RoomAvailability = () => {
     try {
       const res = await api.get('/tenants?status=active');
       if (res.success) {
-        // Filter out tenants already assigned or show all
         setUnassignedTenants(res.tenants);
         if (res.tenants.length > 0) setSelectedTenantId(res.tenants[0].id);
       }
@@ -144,11 +150,10 @@ export const RoomAvailability = () => {
 
   const openTransferModal = (tenant) => {
     setViewedTenant(tenant);
-    // Collect all available beds across the PG
     const avail = [];
-    hierarchy.forEach(flr => {
-      flr.rooms.forEach(rm => {
-        rm.beds.forEach(bd => {
+    hierarchy.forEach((flr) => {
+      flr.rooms.forEach((rm) => {
+        rm.beds.forEach((bd) => {
           if (bd.status === 'available') {
             avail.push({
               ...bd,
@@ -187,12 +192,12 @@ export const RoomAvailability = () => {
   };
 
   if (loading) {
-    return <LoadingSpinner label="Generating interactive bed availability hierarchy..." />;
+    return <LoadingSpinner label="Loading bed availability..." />;
   }
 
   // Filtered beds in selected room
   const currentBeds = selectedRoom?.beds || [];
-  const filteredBeds = currentBeds.filter(b => {
+  const filteredBeds = currentBeds.filter((b) => {
     if (statusFilter !== 'all' && b.status !== statusFilter) return false;
     if (searchFilter) {
       const term = searchFilter.toLowerCase();
@@ -205,80 +210,89 @@ export const RoomAvailability = () => {
 
   return (
     <div className="space-y-6">
-      {/* Compact status legend */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 glass-card p-3 rounded-2xl border border-slate-800">
-        <h1 className="text-base font-bold text-white">Bed Availability</h1>
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          <Badge variant="available_red">Available</Badge>
-          <Badge variant="occupied">Occupied</Badge>
-          <Badge variant="reserved">Reserved</Badge>
-        </div>
-      </div>
-
-      {/* Step 1: Floor Selector Tabs */}
+      {/* Floor Selector Tabs */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        {hierarchy.map((flr) => {
-          const isSelected = selectedFloor?.id === flr.id;
-          return (
-            <button
-              key={flr.id}
-              onClick={() => {
-                setSelectedFloor(flr);
-                setSelectedRoom(preferredRoom(flr));
-              }}
-              className={`p-4 rounded-2xl border text-left transition-all duration-300 relative ${
-                isSelected
-                  ? 'bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-600/30 scale-[1.02]'
-                  : 'glass-card border-slate-800 text-slate-300 hover:border-indigo-500/40 hover:bg-slate-800/80'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="font-extrabold text-sm tracking-tight">Floor {flr.floor_number}</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  isSelected ? 'bg-white/20 text-white' : 'bg-indigo-500/10 text-indigo-400'
-                }`}>
-                  {flr.occupancy_rate}%
-                </span>
-              </div>
-              <div className="text-xs space-y-0.5 opacity-90">
-                <p>Total Beds: {flr.total_beds}</p>
-                <p className={isSelected ? 'text-red-100' : 'text-red-400'}>
-                  Available: {flr.available_beds}
-                </p>
-              </div>
-            </button>
-          );
-        })}
+        {hierarchy
+          .filter((flr) => Number(flr.total_beds) > 0 || hierarchy.length <= 2)
+          .map((flr) => {
+            const isSelected = selectedFloor?.id === flr.id;
+            const cleanFloorName = flr.name
+              ? flr.name.replace(/[-–—].*$/, '').trim()
+              : `Floor ${flr.floor_number}`;
+            const roundedRate = Math.round(Number(flr.occupancy_rate) || 0);
+
+            return (
+              <button
+                key={flr.id}
+                onClick={() => {
+                  setSelectedFloor(flr);
+                  setSelectedRoom(preferredRoom(flr));
+                }}
+                className={`p-4 rounded-2xl border text-left transition-all duration-200 relative ${
+                  isSelected
+                    ? 'bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-600/30'
+                    : 'bg-slate-900/80 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800/80'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="font-extrabold text-sm tracking-tight">{cleanFloorName}</span>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      isSelected ? 'bg-white/20 text-white' : 'bg-indigo-500/10 text-indigo-400'
+                    }`}
+                  >
+                    {roundedRate}% Full
+                  </span>
+                </div>
+                <div className="text-xs space-y-0.5 opacity-90">
+                  <p className="text-slate-400">Total Beds: {flr.total_beds}</p>
+                  <p
+                    className={
+                      isSelected
+                        ? 'text-indigo-100 font-bold'
+                        : flr.available_beds > 0
+                        ? 'text-emerald-400 font-bold'
+                        : 'text-slate-500'
+                    }
+                  >
+                    {flr.available_beds > 0 ? `${flr.available_beds} Available` : 'Fully Occupied'}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
       </div>
 
-      {/* Step 2 & 3: Rooms List & Bed Layout Drill Down */}
+      {/* Rooms List & Bed Layout Drill Down */}
       {selectedFloor && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Rooms Column (4 cols) */}
           <div className="lg:col-span-4 space-y-3">
-            <div className="glass-card p-4 rounded-2xl border border-slate-800">
+            <div className="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
-                Rooms on Floor {selectedFloor.floor_number} ({selectedFloor.rooms.length} Rooms)
+                Rooms on {selectedFloor.name ? selectedFloor.name.replace(/[-–—].*$/, '').trim() : `Floor ${selectedFloor.floor_number}`} ({selectedFloor.rooms.length} Rooms)
               </h3>
 
-              <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
+              <div className="space-y-2 max-h-[620px] overflow-y-auto pr-1">
                 {selectedFloor.rooms.map((room) => {
                   const isSelected = selectedRoom?.id === room.id;
+                  const isFull = Number(room.available_beds) === 0;
+
                   return (
                     <button
                       key={room.id}
                       onClick={() => setSelectedRoom(room)}
                       className={`w-full p-3.5 rounded-xl border text-left transition flex items-center justify-between ${
                         isSelected
-                          ? 'bg-indigo-950/80 border-indigo-500 text-white shadow-lg'
+                          ? 'bg-indigo-950/80 border-indigo-500 text-white shadow-md ring-1 ring-indigo-500/40'
                           : 'bg-slate-900/60 border-slate-800/80 text-slate-300 hover:bg-slate-800/80'
                       }`}
                     >
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-sm text-white">Room {room.room_number}</span>
-                          <span className="text-[10px] uppercase font-semibold text-indigo-400 px-1.5 py-0.5 bg-indigo-500/10 rounded">
-                            {room.room_type.replace('_', ' ')}
+                          <span className="text-[10px] font-semibold text-indigo-400 px-2 py-0.5 bg-indigo-500/10 rounded-md border border-indigo-500/20">
+                            {formatSharing(room.room_type)}
                           </span>
                         </div>
                         <p className="text-[11px] text-slate-400 mt-1">
@@ -287,10 +301,16 @@ export const RoomAvailability = () => {
                       </div>
 
                       <div className="text-right">
-                        <span className={`text-xs font-bold ${room.available_beds > 0 ? 'text-red-400' : 'text-slate-500'}`}>
-                          {room.available_beds} Available
-                        </span>
-                        <p className="text-[10px] text-slate-400">
+                        {isFull ? (
+                          <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
+                            Full ({room.occupied_beds}/{room.total_beds})
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                            {room.available_beds} Vacant
+                          </span>
+                        )}
+                        <p className="text-[10px] text-slate-500 mt-1">
                           {room.occupied_beds}/{room.total_beds} Occupied
                         </p>
                       </div>
@@ -304,36 +324,38 @@ export const RoomAvailability = () => {
           {/* Individual Room Bed Layout Matrix (8 cols) */}
           <div className="lg:col-span-8 space-y-4">
             {selectedRoom ? (
-              <div className="glass-card p-6 rounded-3xl border border-slate-800 space-y-6">
+              <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-6">
                 {/* Room Details Bar */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-3">
                   <div>
-                    <div className="flex items-center gap-3">
-                      <h2 className="text-xl font-extrabold text-white">ROOM {selectedRoom.room_number}</h2>
-                      <span className="px-2.5 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 rounded-full text-xs font-bold">
-                        {selectedRoom.room_type.replace('_', ' ')}
+                    <div className="flex items-center gap-2.5">
+                      <h2 className="text-xl font-extrabold text-white">Room {selectedRoom.room_number}</h2>
+                      <span className="px-2.5 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 rounded-full text-xs font-bold">
+                        {formatSharing(selectedRoom.room_type)}
                       </span>
                       {selectedRoom.has_ac ? (
-                        <span className="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30">AC</span>
+                        <span className="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30 font-bold">
+                          AC
+                        </span>
                       ) : null}
                     </div>
                     <p className="text-xs text-slate-400 mt-1">
-                      Floor {selectedFloor.floor_number} • Monthly Rent: ₹{Number(selectedRoom.base_rent).toLocaleString('en-IN')}
+                      Floor {selectedFloor.floor_number} • Rent: ₹{Number(selectedRoom.base_rent).toLocaleString('en-IN')}/month
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3 text-xs">
-                    <div className="text-center px-3 py-1.5 bg-slate-800/80 rounded-xl">
+                  <div className="flex items-center gap-2.5 text-xs">
+                    <div className="text-center px-3 py-1.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
                       <span className="text-slate-400 block text-[10px]">Total Beds</span>
                       <span className="font-bold text-white text-sm">{selectedRoom.total_beds}</span>
                     </div>
-                    <div className="text-center px-3 py-1.5 bg-indigo-950/60 rounded-xl border border-indigo-500/20">
+                    <div className="text-center px-3 py-1.5 bg-indigo-950/60 rounded-xl border border-indigo-500/30">
                       <span className="text-indigo-300 block text-[10px]">Occupied</span>
                       <span className="font-bold text-indigo-200 text-sm">{selectedRoom.occupied_beds}</span>
                     </div>
-                    <div className="text-center px-3 py-1.5 bg-red-950/60 rounded-xl border border-red-500/30">
-                      <span className="text-red-300 block text-[10px]">Available</span>
-                      <span className="font-bold text-red-200 text-sm">{selectedRoom.available_beds}</span>
+                    <div className="text-center px-3 py-1.5 bg-emerald-950/60 rounded-xl border border-emerald-500/30">
+                      <span className="text-emerald-300 block text-[10px]">Vacant</span>
+                      <span className="font-bold text-emerald-300 text-sm">{selectedRoom.available_beds}</span>
                     </div>
                   </div>
                 </div>
@@ -341,17 +363,22 @@ export const RoomAvailability = () => {
                 {/* Filter and Bed Search */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-                    {['all', 'available', 'occupied', 'reserved'].map((st) => (
+                    {[
+                      { key: 'all', label: 'All Beds' },
+                      { key: 'available', label: 'Vacant' },
+                      { key: 'occupied', label: 'Occupied' },
+                      { key: 'reserved', label: 'Reserved' }
+                    ].map((st) => (
                       <button
-                        key={st}
-                        onClick={() => setStatusFilter(st)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition shrink-0 ${
-                          statusFilter === st
+                        key={st.key}
+                        onClick={() => setStatusFilter(st.key)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${
+                          statusFilter === st.key
                             ? 'bg-indigo-600 text-white shadow-md'
                             : 'bg-slate-800/70 text-slate-400 hover:text-white'
                         }`}
                       >
-                        {st}
+                        {st.label}
                       </button>
                     ))}
                   </div>
@@ -360,70 +387,69 @@ export const RoomAvailability = () => {
                     <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Filter beds or tenants..."
+                      placeholder="Filter beds or residents..."
                       value={searchFilter}
                       onChange={(e) => setSearchFilter(e.target.value)}
-                      className="pl-8 pr-3 py-1.5 bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                      className="pl-8 pr-3 py-1.5 bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-full sm:w-56"
                     />
                   </div>
                 </div>
 
-                {/* Visual Bed Cards Grid (Interactive Layout with 3 Color Codes) */}
+                {/* Visual Bed Cards Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                   {filteredBeds.map((bed) => {
                     const isOccupied = bed.status === 'occupied';
                     const isAvailable = bed.status === 'available';
-                    const isReserved = bed.status === 'reserved' || bed.status === 'pre_booked' || bed.status === 'maintenance';
 
                     return (
-                      <motion.div
+                      <div
                         key={bed.id}
-                        data-testid={`bed-card-${bed.bed_number.replace(/\s+/g, '-').toLowerCase()}`}
-                        aria-label={`Inspect bed ${bed.bed_number}`}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        whileHover={{ y: -3 }}
-                        onClick={() => handleInspectBed(bed)}
-                        className={`p-4 rounded-2xl border transition-all duration-200 relative group flex flex-col justify-between cursor-pointer ${
+                        className={`p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between min-h-[195px] ${
                           isOccupied
-                            ? 'bg-gradient-to-br from-emerald-950/40 to-slate-900 border-emerald-500/40 hover:border-emerald-500/70 shadow-lg shadow-emerald-950/30'
+                            ? 'bg-gradient-to-br from-slate-900 to-slate-950 border-emerald-500/30 shadow-lg'
                             : isAvailable
-                            ? 'bg-gradient-to-br from-red-950/30 to-slate-900 border-red-500/40 hover:border-red-500/70 shadow-lg shadow-red-950/30'
-                            : 'bg-gradient-to-br from-amber-950/30 to-slate-900 border-amber-500/40 hover:border-amber-500/70 shadow-lg shadow-amber-950/30'
+                            ? 'bg-gradient-to-br from-slate-900 to-slate-950 border-indigo-500/30 shadow-lg'
+                            : 'bg-gradient-to-br from-slate-900 to-slate-950 border-amber-500/30 shadow-lg'
                         }`}
                       >
                         {/* Top Bed Header */}
-                        <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
                           <div className="flex items-center gap-2">
-                            <div className={`p-2 rounded-xl ${
-                              isOccupied 
-                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                                : isAvailable 
-                                ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
-                                : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                            }`}>
+                            <div
+                              className={`p-2 rounded-xl ${
+                                isOccupied
+                                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                                  : isAvailable
+                                  ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30'
+                                  : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                              }`}
+                            >
                               <BedDouble className="w-4 h-4" />
                             </div>
                             <span className="font-extrabold text-sm text-white tracking-wide">{bed.bed_number}</span>
                           </div>
+
                           {isOccupied ? (
-                            <Badge variant="occupied" size="sm">🟢 Occupied</Badge>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                              ● Occupied
+                            </span>
                           ) : isAvailable ? (
-                            <Badge variant="available" size="sm">🔴 Vacant</Badge>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                              ● Vacant
+                            </span>
                           ) : (
-                            <Badge variant="reserved" size="sm">🟡 Reserved / Joining Soon</Badge>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                              ● Reserved
+                            </span>
                           )}
                         </div>
 
                         {/* Middle Content */}
-                        <div className="py-2">
+                        <div className="py-2.5 flex-1 flex flex-col justify-center">
                           {isOccupied && bed.tenant_name ? (
                             <div
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openTenantModal(bed.tenant_id);
-                              }}
-                              className="p-2.5 rounded-xl bg-slate-800/80 border border-emerald-500/20 cursor-pointer hover:border-emerald-400 transition"
+                              onClick={() => openTenantModal(bed.tenant_id)}
+                              className="p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:border-emerald-500/40 cursor-pointer transition"
                             >
                               <div className="flex items-center gap-2.5">
                                 <img
@@ -433,87 +459,68 @@ export const RoomAvailability = () => {
                                 />
                                 <div className="overflow-hidden leading-tight flex-1">
                                   <p className="text-xs font-bold text-white truncate">{bed.tenant_name}</p>
-                                  <p className="text-[10px] text-slate-400 truncate">{bed.tenant_phone}</p>
+                                  <p className="text-[10px] text-slate-400 truncate mt-0.5">{bed.tenant_phone}</p>
                                 </div>
-                                <span className="text-[9px] px-1.5 py-0.5 rounded font-bold bg-emerald-500/20 text-emerald-300">Active</span>
+                                <span className="text-[9px] px-1.5 py-0.5 rounded font-bold bg-emerald-500/20 text-emerald-300 shrink-0">
+                                  Active
+                                </span>
                               </div>
                             </div>
                           ) : isAvailable ? (
-                            <div className="p-3 text-center bg-red-500/5 border border-red-500/30 rounded-xl">
-                              <p className="text-xs font-bold text-red-300">Ready to Rent</p>
-                              <p className="text-[10px] text-slate-400 mt-0.5">Click anywhere to inspect or assign</p>
+                            <div className="p-3 text-center bg-indigo-500/5 border border-indigo-500/20 rounded-xl">
+                              <span className="text-xs font-extrabold text-white block">
+                                ₹{Number(bed.monthly_rent || selectedRoom.base_rent).toLocaleString('en-IN')} / mo
+                              </span>
+                              <span className="text-[10px] text-indigo-300 mt-0.5 block">Ready for Immediate Stay</span>
                             </div>
                           ) : (
-                            <div className="p-3 text-center bg-amber-500/5 border border-amber-500/30 rounded-xl">
-                              <p className="text-xs font-bold text-amber-300">Reserved / Joining Soon</p>
-                              <p className="text-[10px] text-slate-400 mt-0.5">Pre-booked or onboarding</p>
+                            <div className="p-3 text-center bg-amber-500/5 border border-amber-500/20 rounded-xl">
+                              <span className="text-xs font-bold text-amber-300 block">Reserved / Joining Soon</span>
+                              <span className="text-[10px] text-slate-400 mt-0.5 block">Pre-booked by resident</span>
                             </div>
                           )}
                         </div>
 
-                        {/* Bottom Actions */}
-                        <div className="pt-3 border-t border-slate-800/60 mt-2 flex items-center justify-between">
-                          <span className="text-[11px] text-slate-400">
+                        {/* Bottom Action Footer */}
+                        <div className="pt-2.5 border-t border-slate-800/80 flex items-center justify-between gap-2">
+                          <span className="text-[11px] text-slate-400 font-medium">
                             Rent: ₹{Number(bed.monthly_rent || selectedRoom.base_rent).toLocaleString('en-IN')}/mo
                           </span>
 
-                          <div className="flex items-center gap-2">
-                            {isAvailable ? (
-                              <>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleInspectBed(bed);
-                                  }}
-                                  className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-lg transition"
-                                >
-                                  Inspect Bed
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    openAssignModal(bed);
-                                  }}
-                                  className="px-3 py-1 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-lg shadow-md transition flex items-center gap-1"
-                                >
-                                  <UserPlus className="w-3.5 h-3.5" />
-                                  <span>Assign</span>
-                                </button>
-                              </>
-                            ) : isOccupied ? (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openTenantModal(bed.tenant_id);
-                                }}
-                                className="text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30 transition"
-                              >
-                                Details &rarr;
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleInspectBed(bed);
-                                }}
-                                className="px-2.5 py-1 bg-amber-500/20 text-amber-300 font-bold text-xs rounded-lg transition"
-                              >
-                                Inspect
-                              </button>
-                            )}
-                          </div>
+                          {isAvailable ? (
+                            <button
+                              type="button"
+                              onClick={() => openAssignModal(bed)}
+                              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-lg shadow-md transition flex items-center gap-1.5"
+                            >
+                              <UserPlus className="w-3.5 h-3.5" />
+                              <span>Assign Bed</span>
+                            </button>
+                          ) : isOccupied ? (
+                            <button
+                              type="button"
+                              onClick={() => openTenantModal(bed.tenant_id)}
+                              className="text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30 transition"
+                            >
+                              Details &rarr;
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleInspectBed(bed)}
+                              className="px-2.5 py-1 bg-amber-500/15 text-amber-300 font-bold text-xs rounded-lg border border-amber-500/30 transition"
+                            >
+                              Manage Bed
+                            </button>
+                          )}
                         </div>
-                      </motion.div>
+                      </div>
                     );
                   })}
                 </div>
               </div>
             ) : (
-              <div className="glass-card p-12 rounded-3xl border border-slate-800 text-center text-slate-400">
+              <div className="bg-slate-900/80 p-12 rounded-3xl border border-slate-800 text-center text-slate-400">
                 Please select a room from the left to view bed layout.
               </div>
             )}
@@ -546,9 +553,11 @@ export const RoomAvailability = () => {
 
           <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/20 rounded-xl text-xs space-y-1">
             <p className="font-bold text-white">Bed Assignment Details:</p>
-            <p className="text-slate-300">• Room Type: {selectedRoom?.room_type.replace('_', ' ')}</p>
-            <p className="text-slate-300">• Monthly Rent: ₹{Number(selectedBedForAssign?.monthly_rent || 6000).toLocaleString('en-IN')}</p>
-            <p className="text-slate-300">• Automatic status change: Bed will turn to "Occupied".</p>
+            <p className="text-slate-300">• Room Type: {formatSharing(selectedRoom?.room_type)}</p>
+            <p className="text-slate-300">
+              • Monthly Rent: ₹{Number(selectedBedForAssign?.monthly_rent || 6000).toLocaleString('en-IN')}
+            </p>
+            <p className="text-slate-300">• Status: Bed will become "Occupied".</p>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
@@ -590,7 +599,9 @@ export const RoomAvailability = () => {
                   <Badge variant={viewedTenant.status}>{viewedTenant.status}</Badge>
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  {viewedTenant.occupation_type === 'working' ? `Working at ${viewedTenant.company_name || 'IT Tech'}` : `Student at ${viewedTenant.college_name || 'University'}`}
+                  {viewedTenant.occupation_type === 'working'
+                    ? `Working at ${viewedTenant.company_name || 'Organization'}`
+                    : `Student at ${viewedTenant.college_name || 'College'}`}
                 </p>
                 <div className="flex items-center gap-4 text-xs text-slate-400 mt-2">
                   <span className="flex items-center gap-1 text-indigo-300">
@@ -611,7 +622,9 @@ export const RoomAvailability = () => {
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <span className="text-slate-400 block text-[10px]">Contact Person</span>
-                  <span className="font-bold text-white">{viewedTenant.emergency_contact_name} ({viewedTenant.relationship_with_emergency_contact})</span>
+                  <span className="font-bold text-white">
+                    {viewedTenant.emergency_contact_name} ({viewedTenant.relationship_with_emergency_contact})
+                  </span>
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[10px]">Emergency Phone</span>
@@ -672,9 +685,12 @@ export const RoomAvailability = () => {
 
           <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/20 rounded-xl text-xs space-y-1">
             <p className="font-bold text-white">Transfer Operations:</p>
-            <p className="text-slate-300">• Current bed ({viewedTenant?.bed_number}) will automatically become <strong>Available</strong>.</p>
-            <p className="text-slate-300">• Selected target bed will turn to <strong>Occupied</strong>.</p>
-            <p className="text-slate-300">• Assignment history will be logged with timestamp.</p>
+            <p className="text-slate-300">
+              • Current bed ({viewedTenant?.bed_number}) will automatically become <strong>Available</strong>.
+            </p>
+            <p className="text-slate-300">
+              • Selected target bed will turn to <strong>Occupied</strong>.
+            </p>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
@@ -712,7 +728,9 @@ export const RoomAvailability = () => {
                   </div>
                   <div>
                     <h4 className="text-base font-bold text-white">{viewedBed.bed_number}</h4>
-                    <p className="text-xs text-slate-400">Room {selectedRoom?.room_number} • {selectedRoom?.room_type?.replace('_', ' ')}</p>
+                    <p className="text-xs text-slate-400">
+                      Room {selectedRoom?.room_number} • {formatSharing(selectedRoom?.room_type)}
+                    </p>
                   </div>
                 </div>
                 <Badge variant={viewedBed.status}>{viewedBed.status}</Badge>
@@ -721,15 +739,21 @@ export const RoomAvailability = () => {
               <div className="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-slate-700/50">
                 <div>
                   <span className="text-slate-400 block text-[10px]">Monthly Rent</span>
-                  <span className="font-bold text-white text-sm">₹{Number(viewedBed.monthly_rent || selectedRoom?.base_rent || 6000).toLocaleString('en-IN')}</span>
+                  <span className="font-bold text-white text-sm">
+                    ₹{Number(viewedBed.monthly_rent || selectedRoom?.base_rent || 6000).toLocaleString('en-IN')}
+                  </span>
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[10px]">Security Deposit</span>
-                  <span className="font-bold text-white text-sm">₹{Number(viewedBed.security_deposit || (selectedRoom?.base_rent || 6000) * 2).toLocaleString('en-IN')}</span>
+                  <span className="font-bold text-white text-sm">
+                    ₹{Number(viewedBed.security_deposit || (selectedRoom?.base_rent || 6000) * 2).toLocaleString('en-IN')}
+                  </span>
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[10px]">Room Amenities</span>
-                  <span className="font-semibold text-indigo-300">{selectedRoom?.has_ac ? 'AC Room' : 'Non-AC'} • Attached Washroom</span>
+                  <span className="font-semibold text-indigo-300">
+                    {selectedRoom?.has_ac ? 'AC Room' : 'Non-AC'} • Attached Washroom
+                  </span>
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[10px]">Occupancy State</span>
