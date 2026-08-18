@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -31,6 +31,17 @@ export const LandingPage = () => {
   const [property, setProperty] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+  const videoRef = useRef(null);
+
+  // Imperatively guarantee muted autoplay across all mobile & desktop browsers
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = true;
+      videoRef.current.play().catch((err) => {
+        console.warn('Autoplay initiated with user interaction policy:', err.message);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const loadInfo = async () => {
@@ -201,22 +212,20 @@ export const LandingPage = () => {
         {/* Full-width Background Video Layer */}
         <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-20">
           <video
+            ref={videoRef}
             autoPlay
             loop
             muted
             playsInline
-            preload="metadata"
+            preload="auto"
             poster="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1600&q=80"
             className="w-full h-full object-cover scale-105 transition-transform duration-1000 opacity-75"
             aria-hidden="true"
           >
             {/* Primary Expected Local Video Asset */}
             <source src="/videos/pg-hero.mp4" type="video/mp4" />
-            {/* Smooth Cinematic Interior Sample Fallback */}
-            <source
-              src="https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-41525-large.mp4"
-              type="video/mp4"
-            />
+            {/* Direct High-Reliability Video Stream Fallback */}
+            <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
             {/* Graceful Fallback Static Bedroom Image */}
             <img
               src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1600&q=80"
