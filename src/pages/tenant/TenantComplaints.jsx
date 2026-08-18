@@ -76,10 +76,10 @@ export const TenantComplaints = () => {
         <div>
           <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
             <Wrench className="w-6 h-6 text-indigo-400" />
-            <span>Maintenance & Help Desk</span>
+            <span>Maintenance Requests</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Raise requests for Wi-Fi, electricity, plumbing, water, or room cleaning.
+            Submit service requests for quick assistance.
           </p>
         </div>
 
@@ -88,19 +88,19 @@ export const TenantComplaints = () => {
           className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          <span>Raise New Request</span>
+          <span>Raise Request</span>
         </button>
       </div>
 
       {/* Tickets List */}
       {loading ? (
-        <LoadingSpinner label="Loading your tickets..." />
+        <LoadingSpinner label="Loading tickets..." />
       ) : complaints.length === 0 ? (
         <EmptyState
           icon={CheckCircle2}
           title="No Active Requests"
-          description="Everything is running smoothly. If you need any assistance with facilities, raise a ticket."
-          actionText="Raise New Request"
+          description="No open maintenance requests."
+          actionText="Raise Request"
           onAction={() => setModalOpen(true)}
         />
       ) : (

@@ -89,7 +89,7 @@ export const LoginPage = () => {
                 </span>
               </h2>
               <p className="text-slate-400 text-sm mt-3 leading-relaxed max-w-sm">
-                Manage room capacities, online Razorpay rent collections, maintenance tickets, and resident history with ease.
+                Smart digital resident & property management portal.
               </p>
             </div>
 
@@ -108,7 +108,7 @@ export const LoginPage = () => {
             </div>
           </div>
 
-          <p className="text-slate-500 text-xs">© 2026 Royal Orchid PG. All rights reserved.</p>
+          <p className="text-slate-500 text-xs">© {new Date().getFullYear()} Royal Orchid PG</p>
         </div>
       </div>
 
@@ -131,13 +131,13 @@ export const LoginPage = () => {
 
           <div>
             <h1 className="text-2xl font-bold text-white">Welcome back</h1>
-            <p className="text-xs text-slate-400 mt-1">Sign in to continue to your portal</p>
+            <p className="text-xs text-slate-400 mt-1">Sign in to your account</p>
           </div>
 
           {/* Quick Demo Login */}
-          <div className="p-4 bg-slate-800/60 border border-slate-700/60 rounded-2xl space-y-2.5">
+          <div className="p-3.5 bg-slate-800/60 border border-slate-700/60 rounded-2xl space-y-2.5">
             <p className="text-[11px] font-bold text-teal-300 uppercase tracking-wider flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-teal-400" /> Demo Access — 1 Click Sign In
+              <Zap className="w-3.5 h-3.5 text-teal-400" /> Demo Quick Access
             </p>
             <div className="grid grid-cols-2 gap-2">
               <button

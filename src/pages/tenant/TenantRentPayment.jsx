@@ -300,10 +300,10 @@ export const TenantRentPayment = () => {
       <div className="glass-card p-6 rounded-3xl border border-slate-800">
         <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
           <CreditCard className="w-6 h-6 text-emerald-400" />
-          <span>Pay Rent & Digital Dues</span>
+          <span>Rent Payment</span>
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Instant Razorpay online payments with verified receipts or manual UPI QR fallback.
+          Pay your monthly rent securely via UPI, Card, or Net Banking.
         </p>
       </div>
 
@@ -353,7 +353,7 @@ export const TenantRentPayment = () => {
               <CheckCircle2 className="w-6 h-6 text-emerald-400" />
               <div>
                 <h4 className="text-sm font-bold text-white">Monthly Rent Paid in Full</h4>
-                <p className="text-xs text-emerald-200/80">Thank you! Your payment is confirmed and digital receipt is ready.</p>
+                <p className="text-xs text-emerald-200/80">Your payment is confirmed and digital receipt is ready.</p>
               </div>
             </div>
             <button
@@ -370,9 +370,9 @@ export const TenantRentPayment = () => {
           <div className="p-4 rounded-2xl bg-purple-950/40 border border-purple-500/40 flex items-center gap-3">
             <Clock className="w-6 h-6 text-purple-400 animate-spin" />
             <div>
-              <h4 className="text-sm font-bold text-white">Payment Proof Submitted & Under Review</h4>
+              <h4 className="text-sm font-bold text-white">Payment Proof Under Review</h4>
               <p className="text-xs text-purple-200">
-                You have uploaded a manual payment proof. The PG Owner is reviewing the transaction. Status will turn to Paid upon verification.
+                Your payment proof has been submitted for owner verification.
               </p>
             </div>
           </div>
