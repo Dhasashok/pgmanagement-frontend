@@ -23,15 +23,15 @@ export const Modal = ({ isOpen, onClose, title, subtitle, children, maxWidth = '
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+        className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-start justify-center p-3 pt-4 sm:pt-10 pb-8 sm:px-6 overflow-y-auto"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
         <motion.div
-          initial={{ opacity: 0, y: 15, scale: 0.98 }}
+          initial={{ opacity: 0, y: -10, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 15, scale: 0.98 }}
+          exit={{ opacity: 0, y: -10, scale: 0.98 }}
           transition={{ duration: 0.2 }}
-          className={`w-full ${maxWidth} bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] sm:max-h-[90vh] my-auto`}
+          className={`w-full ${maxWidth} bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]`}
         >
           {/* Sticky Modal Header */}
           <div className="flex items-center justify-between px-4 py-3.5 sm:px-6 sm:py-4 border-b border-slate-800 bg-slate-900 shrink-0">
