@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const isProduction = import.meta.env.PROD || (typeof window !== 'undefined' && (window.location.hostname.includes('netlify.app') || window.location.hostname.includes('vercel.app')));
+const API_BASE = import.meta.env.VITE_API_URL || (isProduction ? 'https://pgmanagement-backend.onrender.com/api' : '/api');
 
 const api = axios.create({
   baseURL: API_BASE,
-  timeout: 15000,
+  timeout: 25000,
 });
 
 // Request interceptor to attach JWT
