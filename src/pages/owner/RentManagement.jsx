@@ -71,7 +71,22 @@ export const RentManagement = () => {
             pending_amount: isPaid ? 0 : Number(r.pending_amount || 0)
           };
         });
-        setRecords(cleanRecords);
+
+        // Filter strictly by active status tab
+        const finalRecords = statusFilter === 'all'
+          ? cleanRecords
+          : cleanRecords.filter((r) => {
+              const isPaid = Number(r.pending_amount || 0) <= 0 || r.status === 'paid';
+              if (statusFilter === 'paid') return isPaid;
+              if (isPaid) return false; // Paid records should NEVER appear in unpaid tabs (overdue, due_today, pending)
+              if (statusFilter === 'overdue') return r.status === 'overdue' || (String(r.due_date).slice(0, 10) < todayStr);
+              if (statusFilter === 'due_today') return String(r.due_date).slice(0, 10) === todayStr;
+              if (statusFilter === 'verification_pending') return r.status === 'verification_pending';
+              if (statusFilter === 'pending') return r.status === 'pending';
+              return true;
+            });
+
+        setRecords(finalRecords);
       }
       if (statRes.success) setStats(statRes.stats);
     } catch (err) {
