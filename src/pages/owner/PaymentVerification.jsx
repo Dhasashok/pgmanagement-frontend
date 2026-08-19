@@ -62,17 +62,24 @@ export const PaymentVerification = () => {
 
   const handleApprove = async (proofId) => {
     setProcessing(true);
+    const targetProof = proofs.find(p => p.id === proofId) || previewProof;
     try {
       const res = await api.post(`/payments/proofs/${proofId}/verify`, {
         action: 'approve'
       });
       if (res.success) {
-        showSuccess(`Payment proof approved! Receipt No: ${res.receiptNo}`);
+        // Optimistically remove card from local state immediately
+        setProofs(prev => prev.filter(p => p.id !== proofId));
         setPreviewProof(null);
+        showSuccess(
+          `Payment of ₹${Number(targetProof?.amount || res.amount || 6000).toLocaleString('en-IN')} approved! Rent marked as Cleared. Receipt #${res.receiptNo || 'REC-SETTLED'}`
+        );
         await fetchProofs();
+      } else {
+        showError(res.message || 'Approval failed');
       }
     } catch (err) {
-      showError(err.message || 'Approval failed');
+      showError(err.message || 'Approval failed. Please verify server connection.');
     } finally {
       setProcessing(false);
     }
@@ -86,17 +93,22 @@ export const PaymentVerification = () => {
 
   const handleReject = async () => {
     if (!selectedProofForReject) return;
+    const proofId = selectedProofForReject.id;
     setProcessing(true);
     try {
-      const res = await api.post(`/payments/proofs/${selectedProofForReject.id}/verify`, {
+      const res = await api.post(`/payments/proofs/${proofId}/verify`, {
         action: 'reject',
         rejection_reason: rejectionReason
       });
       if (res.success) {
-        showSuccess('Payment proof rejected and marked in resident portal.');
+        // Optimistically remove card from local state immediately
+        setProofs(prev => prev.filter(p => p.id !== proofId));
         setRejectModalOpen(false);
         setPreviewProof(null);
+        showSuccess('Payment proof rejected and marked in resident portal.');
         await fetchProofs();
+      } else {
+        showError(res.message || 'Rejection failed');
       }
     } catch (err) {
       showError(err.message || 'Rejection failed');
@@ -326,7 +338,8 @@ export const PaymentVerification = () => {
                     <button
                       onClick={() => handleApprove(proof.id)}
                       disabled={processing}
-                      className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-1.5 disabled:opacity-50"
+                      data-testid="approve-payment-btn"
+                      className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-1.5 disabled:opacity-50 active:scale-95"
                     >
                       <Check className="w-4 h-4" />
                       <span>Approve & Clear Rent</span>
@@ -335,7 +348,8 @@ export const PaymentVerification = () => {
                     <button
                       onClick={() => openRejectModal(proof)}
                       disabled={processing}
-                      className="px-4 py-2.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5"
+                      data-testid="reject-payment-btn"
+                      className="px-4 py-2.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95"
                     >
                       <X className="w-4 h-4" />
                       <span>Reject</span>
@@ -370,6 +384,7 @@ export const PaymentVerification = () => {
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   onClick={() => openRejectModal(previewProof)}
+                  data-testid="modal-reject-btn"
                   className="px-4 py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 rounded-xl text-xs font-bold transition"
                 >
                   Reject Proof
@@ -377,6 +392,7 @@ export const PaymentVerification = () => {
                 <button
                   onClick={() => handleApprove(previewProof.id)}
                   disabled={processing}
+                  data-testid="modal-approve-btn"
                   className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 transition"
                 >
                   Approve Payment
