@@ -26,7 +26,11 @@ import {
   ExternalLink,
   MessageSquare,
   CheckCircle2,
-  Compass
+  Compass,
+  Star,
+  Layers,
+  KeyRound,
+  Check
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -63,7 +67,17 @@ export const LandingPage = () => {
   const pgAddress = property?.address || 'Plot 42, Hinjawadi Phase 1, Rajiv Gandhi Infotech Park, Pune, Maharashtra 411057';
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Hinjawadi Phase 1, Pune ' + pgName)}`;
 
-  // Unified, harmonious color styling (Indigo & Teal luxury dark palette)
+  const marqueeHighlights = [
+    { text: '5 Mins Walk to Infosys & Wipro Hinjawadi', icon: Building },
+    { text: '1 Gbps Optical Mesh Wi-Fi Live', icon: Wifi },
+    { text: '3 Fresh Chef Meals Cooked Daily', icon: Coffee },
+    { text: '24/7 Biometric Smart Keyless Entry', icon: ShieldCheck },
+    { text: '1-Tap UPI Digital Rent Settlements', icon: Zap },
+    { text: 'Daily Sanitization & Deep Housekeeping', icon: Sparkles },
+    { text: '4.9/5 Resident Satisfaction Rating', icon: Star },
+    { text: '100% Automatic Generator Power Backup', icon: Zap },
+  ];
+
   const facilities = [
     {
       icon: Wifi,
@@ -100,6 +114,27 @@ export const LandingPage = () => {
       title: 'Rooftop Cafeteria & Co-working Lounge',
       desc: 'Ergonomic workstations, high-speed charging ports, 65" Smart TV, and chill-out terrace.',
       badge: 'Community'
+    }
+  ];
+
+  const livingSteps = [
+    {
+      step: '01',
+      title: 'Explore Live Bed Matrix',
+      desc: 'View transparent pricing and real-time room & bed availability across all floors.',
+      icon: Layers
+    },
+    {
+      step: '02',
+      title: 'Instant Digital Onboarding',
+      desc: 'Upload Aadhaar, verify OTP, and receive instant biometric room clearance.',
+      icon: KeyRound
+    },
+    {
+      step: '03',
+      title: 'Enjoy Hassle-Free Stay',
+      desc: 'Enjoy hot chef meals, optical Wi-Fi, 1-tap rent payments, and 24/7 maintenance.',
+      icon: Sparkles
     }
   ];
 
@@ -171,6 +206,7 @@ export const LandingPage = () => {
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-7 text-xs sm:text-sm font-semibold text-slate-300">
             <a href="#about" className="hover:text-teal-400 transition-colors">Overview</a>
+            <a href="#experience" className="hover:text-teal-400 transition-colors">How It Works</a>
             <a href="#facilities" className="hover:text-teal-400 transition-colors">Amenities</a>
             <a href="#rules" className="hover:text-teal-400 transition-colors">House Rules</a>
             <a href="#location" className="hover:text-teal-400 transition-colors">Pune Location</a>
@@ -230,6 +266,7 @@ export const LandingPage = () => {
                 <div className="space-y-1">
                   {[
                     { icon: Home, label: 'Overview', href: '#about' },
+                    { icon: Layers, label: 'How It Works', href: '#experience' },
                     { icon: Sparkles, label: 'Amenities', href: '#facilities' },
                     { icon: FileText, label: 'House Rules', href: '#rules' },
                     { icon: MapPin, label: 'Pune Location & Map', href: '#location' },
@@ -338,7 +375,7 @@ export const LandingPage = () => {
             </a>
           </div>
 
-          {/* Quick Metrics Bar (Harmonious Theme) */}
+          {/* Quick Metrics Bar */}
           <div className="mt-10 sm:mt-12 grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3.5 max-w-4xl mx-auto">
             {[
               { num: '1 Gbps', label: 'Optical Fiber Wi-Fi' },
@@ -355,8 +392,82 @@ export const LandingPage = () => {
         </div>
       </section>
 
+      {/* 🌟 ANIMATED INFINITE TRUST & HIGHLIGHT MARQUEE TICKER (Directly Below Video) */}
+      <div className="relative overflow-hidden border-y border-slate-800/90 bg-slate-900/70 py-3.5 backdrop-blur-md">
+        {/* Left & Right gradient fade masks */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-slate-950 to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-slate-950 to-transparent z-10" />
+
+        <div className="animate-marquee flex items-center gap-6 sm:gap-8">
+          {[...marqueeHighlights, ...marqueeHighlights].map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={index}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-950/80 border border-slate-800/80 text-xs font-semibold text-slate-200 shrink-0 shadow-sm hover:border-teal-500/40 transition"
+              >
+                <div className="w-5 h-5 rounded-full bg-teal-500/15 flex items-center justify-center text-teal-400 shrink-0">
+                  <Icon className="w-3 h-3" />
+                </div>
+                <span className="whitespace-nowrap">{item.text}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 🌟 ANIMATED "HOW IT WORKS" INTERACTIVE EXPERIENCE SECTION */}
+      <section id="experience" className="py-14 sm:py-16 bg-slate-950 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-xl mx-auto mb-8 sm:mb-12">
+            <span className="text-xs font-bold text-teal-400 uppercase tracking-widest block mb-1">
+              Seamless Process
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              How Smart Co-Living Works
+            </h2>
+            <p className="text-xs text-slate-400 mt-1.5">
+              From zero-deposit check-in to digital rent receipts, everything is automated.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 relative">
+            {livingSteps.map((step, idx) => {
+              const Icon = step.icon;
+              return (
+                <motion.div
+                  key={step.step}
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: idx * 0.1 }}
+                  whileHover={{ y: -5 }}
+                  className="relative p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-slate-900/90 to-slate-950 border border-slate-800/90 hover:border-teal-500/40 transition shadow-xl space-y-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="w-11 h-11 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center shadow-inner">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <span className="text-2xl font-black text-slate-700 select-none">
+                      {step.step}
+                    </span>
+                  </div>
+
+                  <h3 className="text-sm sm:text-base font-extrabold text-white">
+                    {step.title}
+                  </h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    {step.desc}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* AMENITIES SECTION (Unified, Elegant Indigo/Teal Palette) */}
-      <section id="facilities" className="py-14 sm:py-16 bg-slate-950 relative border-t border-slate-900">
+      <section id="facilities" className="py-14 sm:py-16 bg-slate-900/30 relative border-t border-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-xl mx-auto mb-8 sm:mb-12">
             <span className="text-xs font-bold text-teal-400 uppercase tracking-widest block mb-1">
@@ -375,8 +486,13 @@ export const LandingPage = () => {
             {facilities.map((fac, idx) => {
               const Icon = fac.icon;
               return (
-                <div
+                <motion.div
                   key={idx}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.3, delay: idx * 0.06 }}
+                  whileHover={{ y: -4 }}
                   className="group relative overflow-hidden rounded-2xl bg-slate-900/80 border border-slate-800/90 p-4 sm:p-5 transition-all duration-200 hover:border-teal-500/40 shadow-lg"
                 >
                   <div className="flex items-start justify-between gap-2 mb-3">
@@ -394,7 +510,7 @@ export const LandingPage = () => {
                   <p className="text-xs text-slate-400 leading-relaxed">
                     {fac.desc}
                   </p>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -402,7 +518,7 @@ export const LandingPage = () => {
       </section>
 
       {/* HOUSE RULES SECTION (Refined Community Standards) */}
-      <section id="rules" className="py-14 sm:py-16 bg-slate-900/40 border-y border-slate-800/80 relative">
+      <section id="rules" className="py-14 sm:py-16 bg-slate-950 relative border-t border-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-xl mx-auto mb-8 sm:mb-12">
             <span className="text-xs font-bold text-teal-400 uppercase tracking-widest block mb-1">
@@ -439,7 +555,7 @@ export const LandingPage = () => {
       </section>
 
       {/* PUNE LOCATION & MAP SECTION */}
-      <section id="location" className="py-14 sm:py-18 bg-slate-950 relative">
+      <section id="location" className="py-14 sm:py-18 bg-slate-950 relative border-t border-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-xl mx-auto mb-8 sm:mb-12">
             <span className="text-xs font-bold text-teal-400 uppercase tracking-widest block mb-1">
@@ -570,6 +686,7 @@ export const LandingPage = () => {
               <h4 className="font-semibold text-white uppercase tracking-wider text-[11px] mb-2.5">Quick Links</h4>
               <ul className="space-y-1.5 text-slate-400">
                 <li><a href="#about" className="hover:text-teal-400 transition">Overview</a></li>
+                <li><a href="#experience" className="hover:text-teal-400 transition">How It Works</a></li>
                 <li><a href="#facilities" className="hover:text-teal-400 transition">Amenities</a></li>
                 <li><a href="#rules" className="hover:text-teal-400 transition">House Rules</a></li>
                 <li><a href="#location" className="hover:text-teal-400 transition">Pune Location</a></li>
