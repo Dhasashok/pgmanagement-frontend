@@ -9,7 +9,14 @@ import {
   Sparkles,
   Download,
   MessageSquare,
-  Building
+  Building,
+  ChevronLeft,
+  ChevronRight,
+  Receipt,
+  FileSpreadsheet,
+  Zap,
+  Check,
+  Send
 } from 'lucide-react';
 import { Badge } from '../../components/common/Badge';
 import { Modal } from '../../components/common/Modal';
@@ -26,7 +33,7 @@ const getInitials = (name) => {
 };
 
 export const RentManagement = () => {
-  const { showSuccess, showError } = useNotification();
+  const { showSuccess, showError, showInfo } = useNotification();
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState([]);
   const [stats, setStats] = useState(null);
@@ -93,16 +100,72 @@ export const RentManagement = () => {
     }
   };
 
+  const changeMonth = (delta) => {
+    const [year, month] = selectedMonth.split('-').map(Number);
+    const d = new Date(year, month - 1 + delta, 1);
+    const yStr = d.getFullYear();
+    const mStr = String(d.getMonth() + 1).padStart(2, '0');
+    setSelectedMonth(`${yStr}-${mStr}`);
+  };
+
+  const isCurrentMonth = selectedMonth === new Date().toISOString().slice(0, 7);
+
   const sendWhatsAppReminder = (record) => {
     const rawPhone = (record.tenant_phone || '').replace(/[^0-9]/g, '');
     const phone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
     const pgName = 'Royal Orchid PG';
     const amount = Number(record.pending_amount || record.total_amount).toLocaleString('en-IN');
     const month = record.month_year || 'this month';
-    const message = `Hi ${record.tenant_name || 'Resident'}, this is a gentle reminder from *${pgName}*. Your rent of *₹${amount}* for *${month}* is currently due. You can pay instantly online via Razorpay/UPI here: https://pg-managementf.netlify.app/tenant/payments . Thank you!`;
+    const message = `Hi ${record.tenant_name || 'Resident'}, this is a gentle reminder from *${pgName}*. Your rent of *₹${amount}* for *${month}* is currently due. You can pay instantly online via UPI/Card here: https://pg-managementf.netlify.app/tenant/payments . Thank you!`;
 
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
-    showSuccess(`Opening WhatsApp to send rent reminder to ${record.tenant_name}`);
+    showSuccess(`Opening WhatsApp for ${record.tenant_name}`);
+  };
+
+  const remindAllOverdue = () => {
+    const overdueList = records.filter(
+      (r) => Number(r.pending_amount || 0) > 0 && (r.status === 'overdue' || r.status === 'pending')
+    );
+    if (overdueList.length === 0) {
+      showInfo('No pending or overdue residents for this month.');
+      return;
+    }
+    // Trigger reminder for the first and inform user
+    sendWhatsAppReminder(overdueList[0]);
+    if (overdueList.length > 1) {
+      showInfo(`Opened reminder for ${overdueList[0].tenant_name}. You have ${overdueList.length - 1} more overdue tenant(s).`);
+    }
+  };
+
+  const exportToCSV = () => {
+    if (records.length === 0) {
+      showError('No records to export.');
+      return;
+    }
+    const headers = ['Tenant Name', 'Phone', 'Floor', 'Room', 'Bed', 'Billing Month', 'Total Amount', 'Paid Amount', 'Pending Dues', 'Due Date', 'Status'];
+    const rows = records.map((r) => [
+      `"${r.tenant_name || ''}"`,
+      `"${r.tenant_phone || ''}"`,
+      r.floor_number || '1',
+      r.room_number || '',
+      r.bed_number || '',
+      r.month_year || selectedMonth,
+      r.total_amount || 0,
+      r.paid_amount || 0,
+      r.pending_amount || 0,
+      r.due_date || '',
+      r.status || ''
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `Royal_Orchid_Rent_Ledger_${selectedMonth}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showSuccess(`Downloaded Rent Ledger for ${selectedMonth}`);
   };
 
   const openRecordPayment = (record) => {
@@ -136,12 +199,31 @@ export const RentManagement = () => {
     }
   };
 
-  const viewReceipt = async (receiptNo) => {
-    if (!receiptNo) return;
+  const viewReceipt = async (record) => {
     try {
-      const res = await api.get(`/payments/receipt/${receiptNo}`);
-      if (res.success) {
-        setReceiptData(res.receipt);
+      // Find receipt by payment history or record
+      const payRes = await api.get(`/payments/history?tenant_id=${record.tenant_id}&limit=1`);
+      if (payRes.success && payRes.payments && payRes.payments.length > 0) {
+        const latest = payRes.payments[0];
+        setReceiptData({
+          receipt_number: latest.receipt_no || `REC-${record.month_year.replace('-', '')}-${record.id.slice(-4)}`,
+          tenant_name: record.tenant_name,
+          month_year: record.month_year,
+          amount: latest.amount || record.paid_amount || record.total_amount,
+          created_at: latest.payment_date || new Date().toISOString(),
+          payment_method: latest.payment_method || 'Online / Cash'
+        });
+        setReceiptModalOpen(true);
+      } else {
+        // Fallback receipt from rent record
+        setReceiptData({
+          receipt_number: `REC-${record.month_year.replace('-', '')}-${record.id.slice(-4)}`,
+          tenant_name: record.tenant_name,
+          month_year: record.month_year,
+          amount: record.paid_amount || record.total_amount,
+          created_at: new Date().toISOString(),
+          payment_method: 'Cleared'
+        });
         setReceiptModalOpen(true);
       }
     } catch (err) {
@@ -150,35 +232,81 @@ export const RentManagement = () => {
   };
 
   const formatCurrency = (val) => `₹${Number(val || 0).toLocaleString('en-IN')}`;
-
   const todayStr = new Date().toISOString().slice(0, 10);
 
+  const formattedMonthTitle = new Date(`${selectedMonth}-01`).toLocaleDateString('en-IN', {
+    month: 'long',
+    year: 'numeric'
+  });
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/80 p-6 rounded-3xl border border-slate-800">
+    <div className="space-y-4 sm:space-y-6 max-w-7xl mx-auto">
+      {/* Header with Quick Month Navigator */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/90 p-4 sm:p-6 rounded-3xl border border-slate-800 shadow-xl">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-            <CreditCard className="w-6 h-6 text-indigo-400" />
-            <span>Rent Collection & Dues</span>
-          </h1>
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center">
+              <CreditCard className="w-5 h-5" />
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Rent Ledger & Dues
+            </h1>
+          </div>
           <p className="text-xs text-slate-400 mt-1">
-            Track monthly rental billing, overdue balances, and record collections.
+            Tracking billing, dues, and payment clearances for <strong className="text-indigo-300">{formattedMonthTitle}</strong>.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <input
-            type="month"
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="px-3.5 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-white focus:outline-none focus:border-indigo-500"
-          />
+        {/* Action Controls & Month Navigator */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Month Stepper */}
+          <div className="flex items-center bg-slate-950 border border-slate-800 rounded-2xl p-1 shadow-inner">
+            <button
+              onClick={() => changeMonth(-1)}
+              title="Previous Month"
+              className="p-1.5 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition active:scale-95"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
 
+            <span className="px-3 text-xs font-black text-white tracking-tight min-w-[110px] text-center">
+              {formattedMonthTitle}
+            </span>
+
+            <button
+              onClick={() => changeMonth(1)}
+              title="Next Month"
+              className="p-1.5 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition active:scale-95"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Quick This Month Button */}
+          {!isCurrentMonth && (
+            <button
+              onClick={() => setSelectedMonth(new Date().toISOString().slice(0, 7))}
+              className="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition"
+            >
+              This Month
+            </button>
+          )}
+
+          {/* Export CSV */}
+          <button
+            onClick={exportToCSV}
+            title="Download CSV Ledger"
+            className="px-3 py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-teal-400" />
+            <span className="hidden sm:inline">Export</span>
+          </button>
+
+          {/* Generate Bills */}
           <button
             onClick={handleGenerateBills}
             disabled={submitting}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5 disabled:opacity-50"
+            className="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5 disabled:opacity-50 active:scale-95 shrink-0"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>Generate Bills</span>
@@ -186,75 +314,103 @@ export const RentManagement = () => {
         </div>
       </div>
 
-      {/* Top 5 Metric Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
-        <div className="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+      {/* Metric Counters */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3.5">
+        <div className="bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-800">
           <span className="text-[10px] uppercase font-bold text-slate-400 block">Expected Rent</span>
-          <span className="text-xl font-black text-white">{formatCurrency(stats?.expected_rent)}</span>
-          <span className="text-[10px] text-slate-500 block mt-0.5">{stats?.total_tenants_billed || 0} Tenants Billed</span>
+          <span className="text-lg sm:text-xl font-black text-white">{formatCurrency(stats?.expected_rent)}</span>
+          <span className="text-[10px] text-slate-400 block mt-0.5">{stats?.total_tenants_billed || 0} Tenants Billed</span>
         </div>
 
-        <div className="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+        <div className="bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-800">
           <span className="text-[10px] uppercase font-bold text-emerald-400 block">Collected Rent</span>
-          <span className="text-xl font-black text-emerald-400">{formatCurrency(stats?.collected_rent)}</span>
+          <span className="text-lg sm:text-xl font-black text-emerald-400">{formatCurrency(stats?.collected_rent)}</span>
           <span className="text-[10px] text-emerald-300/80 block mt-0.5">
-            {Math.round(Number(stats?.collection_rate) || 0)}% Collected
+            {Math.round(Number(stats?.collection_rate) || 0)}% Cleared
           </span>
         </div>
 
-        <div className="bg-slate-900/80 p-4 rounded-2xl border border-amber-500/30 bg-amber-500/5">
+        <div className="bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-amber-500/30 bg-amber-500/5">
           <span className="text-[10px] uppercase font-bold text-amber-400 block">Due Today ⚡</span>
-          <span className="text-xl font-black text-amber-300">{formatCurrency(stats?.due_today_amount)}</span>
+          <span className="text-lg sm:text-xl font-black text-amber-300">{formatCurrency(stats?.due_today_amount)}</span>
           <span className="text-[10px] text-amber-300/80 block mt-0.5">{stats?.due_today_count || 0} Tenants Due</span>
         </div>
 
-        <div className="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
-          <span className="text-[10px] uppercase font-bold text-amber-400 block">Pending Rent</span>
-          <span className="text-xl font-black text-amber-400">{formatCurrency(stats?.pending_rent)}</span>
-          <span className="text-[10px] text-amber-300/80 block mt-0.5">{stats?.pending_count || 0} Total Pending</span>
+        <div className="bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-800">
+          <span className="text-[10px] uppercase font-bold text-amber-400 block">Pending Dues</span>
+          <span className="text-lg sm:text-xl font-black text-amber-400">{formatCurrency(stats?.pending_rent)}</span>
+          <span className="text-[10px] text-amber-300/80 block mt-0.5">{stats?.pending_count || 0} Pending Bills</span>
         </div>
 
-        <div className="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+        <div className="bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-800">
           <span className="text-[10px] uppercase font-bold text-rose-400 block">Overdue Amount</span>
-          <span className="text-xl font-black text-rose-400">{formatCurrency(stats?.overdue_rent)}</span>
+          <span className="text-lg sm:text-xl font-black text-rose-400">{formatCurrency(stats?.overdue_rent)}</span>
           <span className="text-[10px] text-rose-300/80 block mt-0.5">{stats?.overdue_count || 0} Overdue Bills</span>
         </div>
       </div>
 
-      {/* Filter and Search */}
-      <div className="bg-slate-900/80 p-4 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+      {/* FILTER TABS WITH LIVE COUNTS & BULK ACTIONS */}
+      <div className="bg-slate-900/90 p-3 sm:p-4 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-md">
+        {/* Scrollable Status Tabs with accurate count pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           {[
-            { id: 'all', label: 'All Bills' },
-            { id: 'due_today', label: `Due Today (${stats?.due_today_count || 0})` },
-            { id: 'overdue', label: `Overdue (${stats?.overdue_count || 0})` },
-            { id: 'pending', label: 'Pending' },
-            { id: 'verification_pending', label: 'Verification Pending' },
-            { id: 'paid', label: 'Paid' }
+            { id: 'all', label: 'All Bills', count: stats?.total_tenants_billed || records.length || 0 },
+            { id: 'due_today', label: 'Due Today', count: stats?.due_today_count || 0, alert: (stats?.due_today_count || 0) > 0 },
+            { id: 'overdue', label: 'Overdue', count: stats?.overdue_count || 0, danger: (stats?.overdue_count || 0) > 0 },
+            { id: 'pending', label: 'Pending', count: stats?.pending_count || 0 },
+            { id: 'verification_pending', label: 'Verification Pending', count: stats?.verification_pending_count || 0, warn: (stats?.verification_pending_count || 0) > 0 },
+            { id: 'paid', label: 'Paid', count: stats?.paid_count || 0 }
           ].map((pill) => (
             <button
               key={pill.id}
               onClick={() => setStatusFilter(pill.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
                 statusFilter === pill.id
                   ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-slate-800/80 text-slate-400 hover:text-white'
+                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800/80'
               }`}
             >
-              {pill.label}
+              <span>{pill.label}</span>
+              <span
+                className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
+                  statusFilter === pill.id
+                    ? 'bg-white/20 text-white'
+                    : pill.danger
+                    ? 'bg-rose-500/20 text-rose-300'
+                    : pill.alert || pill.warn
+                    ? 'bg-amber-500/20 text-amber-300'
+                    : 'bg-slate-800 text-slate-400'
+                }`}
+              >
+                {pill.count}
+              </span>
             </button>
           ))}
         </div>
 
-        <div className="relative">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search resident, room..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-56 sm:w-64 pl-8 pr-3 py-1.5 bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
-          />
+        {/* Search Input & Bulk Reminder button */}
+        <div className="flex items-center gap-2">
+          {(stats?.overdue_count > 0 || stats?.due_today_count > 0) && (
+            <button
+              onClick={remindAllOverdue}
+              className="px-3 py-1.5 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0"
+              title="Send WhatsApp Nudge to Overdue Residents"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Nudge Overdue</span>
+            </button>
+          )}
+
+          <div className="relative w-full sm:w-60">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search resident, room..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+            />
+          </div>
         </div>
       </div>
 
@@ -268,13 +424,15 @@ export const RentManagement = () => {
           description={
             statusFilter === 'overdue'
               ? '100% of rent is collected with zero overdue bills for this period.'
-              : `No rent bills match the selected filter for ${selectedMonth}.`
+              : statusFilter === 'paid'
+              ? `No residents have completed payment yet for ${formattedMonthTitle}.`
+              : `No rent bills match the selected filter for ${formattedMonthTitle}.`
           }
           actionText={statusFilter === 'all' ? 'Generate Monthly Bills' : undefined}
           onAction={statusFilter === 'all' ? handleGenerateBills : undefined}
         />
       ) : (
-        <div className="bg-slate-900/80 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
+        <div className="bg-slate-900/90 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
           {/* Mobile Card List */}
           <div className="md:hidden divide-y divide-slate-800/80">
             {records.map((r) => {
@@ -285,7 +443,7 @@ export const RentManagement = () => {
               return (
                 <div
                   key={r.id}
-                  className={`p-4 ${
+                  className={`p-4 space-y-3 ${
                     isDueToday
                       ? 'bg-amber-950/25 border-l-4 border-amber-500'
                       : isOverdue
@@ -294,7 +452,7 @@ export const RentManagement = () => {
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       {r.tenant_photo ? (
                         <img
                           src={r.tenant_photo}
@@ -306,10 +464,10 @@ export const RentManagement = () => {
                           {getInitials(r.tenant_name)}
                         </div>
                       )}
-                      <div>
-                        <p className="font-bold text-white text-sm">{r.tenant_name}</p>
-                        <p className="text-[11px] text-indigo-300">
-                          Floor {r.floor_number || 1} · Room {r.room_number || '—'} · {r.bed_number || '—'}
+                      <div className="min-w-0">
+                        <p className="font-bold text-white text-sm truncate">{r.tenant_name}</p>
+                        <p className="text-[11px] text-indigo-300 truncate">
+                          Room {r.room_number || '—'} &bull; {r.bed_number || '—'} (Floor {r.floor_number || 1})
                         </p>
                       </div>
                     </div>
@@ -329,40 +487,55 @@ export const RentManagement = () => {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 mt-3 text-[11px]">
+                  <div className="grid grid-cols-3 gap-2 text-[11px] bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/60">
                     <div>
-                      <span className="text-slate-500 block">Total</span>
+                      <span className="text-slate-400 block text-[10px]">Total</span>
                       <span className="font-bold text-white">{formatCurrency(r.total_amount)}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500 block">Paid</span>
+                      <span className="text-slate-400 block text-[10px]">Paid</span>
                       <span className="font-bold text-emerald-400">{formatCurrency(r.paid_amount)}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500 block">Due</span>
+                      <span className="text-slate-400 block text-[10px]">Due</span>
                       <span className={`font-bold ${isOverdue ? 'text-rose-400' : isPaid ? 'text-slate-500' : 'text-amber-400'}`}>
                         {formatCurrency(r.pending_amount)}
                       </span>
                     </div>
                   </div>
 
-                  {!isPaid && (
-                    <div className="grid grid-cols-2 gap-2 mt-3">
+                  {/* Actions for Mobile */}
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[10px] text-slate-400">
+                      Due: {new Date(r.due_date).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                    </span>
+
+                    {isPaid ? (
                       <button
-                        onClick={() => sendWhatsAppReminder(r)}
-                        className="px-3 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5"
+                        onClick={() => viewReceipt(r)}
+                        className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
                       >
-                        <MessageSquare className="w-3.5 h-3.5" />
-                        <span>WhatsApp</span>
+                        <Receipt className="w-3.5 h-3.5 text-teal-400" />
+                        <span>Receipt</span>
                       </button>
-                      <button
-                        onClick={() => openRecordPayment(r)}
-                        className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition"
-                      >
-                        Collect Pay
-                      </button>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => sendWhatsAppReminder(r)}
+                          className="p-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold transition"
+                          title="WhatsApp"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => openRecordPayment(r)}
+                          className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition"
+                        >
+                          Collect Pay
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
@@ -371,9 +544,9 @@ export const RentManagement = () => {
           {/* Desktop Table View */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-900/90 text-slate-400 uppercase tracking-wider font-bold text-[10px] border-b border-slate-800">
+              <thead className="bg-slate-950/80 text-slate-400 uppercase tracking-wider font-bold text-[10px] border-b border-slate-800">
                 <tr>
-                  <th className="py-4 px-6">Tenant & Room</th>
+                  <th className="py-4 px-6">Tenant & Unit</th>
                   <th className="py-4 px-4">Billing Month</th>
                   <th className="py-4 px-4">Total Rent</th>
                   <th className="py-4 px-4">Paid Amount</th>
@@ -383,7 +556,7 @@ export const RentManagement = () => {
                   <th className="py-4 px-6 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
+              <tbody className="divide-y divide-slate-800/60">
                 {records.map((r) => {
                   const isPaid = Number(r.pending_amount || 0) <= 0 || r.status === 'paid';
                   const isDueToday = !isPaid && String(r.due_date).slice(0, 10) === todayStr;
@@ -416,7 +589,7 @@ export const RentManagement = () => {
                           <div>
                             <p className="font-bold text-white text-sm">{r.tenant_name}</p>
                             <p className="text-[11px] text-indigo-400 font-semibold">
-                              Floor {r.floor_number || 1} • Room {r.room_number || '101'} • {r.bed_number}
+                              Floor {r.floor_number || 1} &bull; Room {r.room_number || '—'} &bull; {r.bed_number}
                             </p>
                           </div>
                         </div>
@@ -481,16 +654,25 @@ export const RentManagement = () => {
                             </button>
                             <button
                               onClick={() => openRecordPayment(r)}
-                              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition shadow-md"
+                              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition shadow-md active:scale-95"
                             >
                               Collect Pay
                             </button>
                           </div>
                         ) : (
-                          <span className="text-emerald-400 text-xs font-semibold flex items-center justify-end gap-1">
-                            <CheckCircle className="w-3.5 h-3.5" />
-                            <span>Cleared</span>
-                          </span>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => viewReceipt(r)}
+                              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700/80 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+                            >
+                              <Receipt className="w-3.5 h-3.5 text-teal-400" />
+                              <span>Receipt</span>
+                            </button>
+                            <span className="text-emerald-400 text-xs font-semibold flex items-center gap-1">
+                              <CheckCircle className="w-3.5 h-3.5" />
+                              <span>Cleared</span>
+                            </span>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -612,8 +794,12 @@ export const RentManagement = () => {
               </div>
 
               <div className="p-3 bg-emerald-950/40 border border-emerald-500/30 rounded-xl flex items-center justify-between">
-                <span className="text-emerald-300 font-bold">Amount Paid:</span>
+                <span className="text-emerald-300 font-bold">Amount Cleared:</span>
                 <span className="text-xl font-extrabold text-emerald-400">{formatCurrency(receiptData.amount)}</span>
+              </div>
+
+              <div className="text-[11px] text-slate-400">
+                Payment Channel: <strong className="text-slate-200">{receiptData.payment_method}</strong>
               </div>
             </div>
 
@@ -632,3 +818,5 @@ export const RentManagement = () => {
     </div>
   );
 };
+
+export default RentManagement;
