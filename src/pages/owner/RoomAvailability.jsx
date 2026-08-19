@@ -42,6 +42,7 @@ export const RoomAvailability = () => {
   const [selectedFloor, setSelectedFloor] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all'); // all, available, occupied, reserved
+  const [sharingFilter, setSharingFilter] = useState('all'); // all, 1_sharing, 2_sharing, 3_sharing, 4_sharing, 5_sharing, 7_sharing
   const [searchFilter, setSearchFilter] = useState('');
 
   // Modals
@@ -268,55 +269,122 @@ export const RoomAvailability = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Rooms Column (4 cols) */}
           <div className="lg:col-span-4 space-y-3">
-            <div className="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
-                Rooms on {selectedFloor.name ? selectedFloor.name.replace(/[-–—].*$/, '').trim() : `Floor ${selectedFloor.floor_number}`} ({selectedFloor.rooms.length} Rooms)
-              </h3>
+            <div className="bg-slate-900/80 p-4 rounded-2xl border border-slate-800 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Rooms on {selectedFloor.name ? selectedFloor.name.replace(/[-–—].*$/, '').trim() : `Floor ${selectedFloor.floor_number}`} ({selectedFloor.rooms.length})
+                </h3>
+              </div>
 
-              <div className="space-y-2 max-h-[620px] overflow-y-auto pr-1">
-                {selectedFloor.rooms.map((room) => {
-                  const isSelected = selectedRoom?.id === room.id;
-                  const isFull = Number(room.available_beds) === 0;
-
-                  return (
+              {/* Dedicated Sharing Type Filter Control */}
+              <div className="space-y-1.5 pt-1 pb-2 border-b border-slate-800">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Filter Sharing Type
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5" data-testid="sharing-type-filters">
+                  {[
+                    { key: 'all', label: 'All Sharing' },
+                    { key: '1_sharing', label: '1-Sharing' },
+                    { key: '2_sharing', label: '2-Sharing' },
+                    { key: '3_sharing', label: '3-Sharing' },
+                    { key: '4_sharing', label: '4-Sharing' },
+                    { key: '5_sharing', label: '5-Sharing' },
+                    { key: '7_sharing', label: '7-Sharing' }
+                  ].map((opt) => (
                     <button
-                      key={room.id}
-                      onClick={() => setSelectedRoom(room)}
-                      className={`w-full p-3.5 rounded-xl border text-left transition flex items-center justify-between ${
-                        isSelected
-                          ? 'bg-indigo-950/80 border-indigo-500 text-white shadow-md ring-1 ring-indigo-500/40'
-                          : 'bg-slate-900/60 border-slate-800/80 text-slate-300 hover:bg-slate-800/80'
+                      key={opt.key}
+                      type="button"
+                      data-testid={`filter-sharing-${opt.key}`}
+                      onClick={() => {
+                        setSharingFilter(opt.key);
+                        const matchRooms = opt.key === 'all'
+                          ? selectedFloor.rooms
+                          : selectedFloor.rooms.filter(r => 
+                              r.room_type === opt.key || 
+                              r.sharing_type === opt.key || 
+                              String(r.room_type || '').includes(opt.key.replace('_sharing', '')) || 
+                              String(r.total_beds) === opt.key.replace('_sharing', '')
+                            );
+                        if (matchRooms.length > 0 && (!selectedRoom || !matchRooms.some(r => r.id === selectedRoom.id))) {
+                          setSelectedRoom(matchRooms[0]);
+                        }
+                      }}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
+                        sharingFilter === opt.key
+                          ? 'bg-indigo-600 text-white shadow-sm ring-1 ring-indigo-400'
+                          : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
                       }`}
                     >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-sm text-white">Room {room.room_number}</span>
-                          <span className="text-[10px] font-semibold text-indigo-400 px-2 py-0.5 bg-indigo-500/10 rounded-md border border-indigo-500/20">
-                            {formatSharing(room.room_type)}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-400 mt-1">
-                          Rent: ₹{Number(room.base_rent).toLocaleString('en-IN')}/mo
-                        </p>
-                      </div>
-
-                      <div className="text-right">
-                        {isFull ? (
-                          <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
-                            Full ({room.occupied_beds}/{room.total_beds})
-                          </span>
-                        ) : (
-                          <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                            {room.available_beds} Vacant
-                          </span>
-                        )}
-                        <p className="text-[10px] text-slate-500 mt-1">
-                          {room.occupied_beds}/{room.total_beds} Occupied
-                        </p>
-                      </div>
+                      {opt.label}
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2 max-h-[560px] overflow-y-auto pr-1">
+                {(() => {
+                  const filteredRooms = selectedFloor.rooms.filter((room) => {
+                    if (sharingFilter === 'all') return true;
+                    return (
+                      room.room_type === sharingFilter ||
+                      room.sharing_type === sharingFilter ||
+                      String(room.room_type || '').includes(sharingFilter.replace('_sharing', '')) ||
+                      String(room.total_beds) === sharingFilter.replace('_sharing', '')
+                    );
+                  });
+
+                  if (filteredRooms.length === 0) {
+                    return (
+                      <p className="text-xs text-slate-500 text-center py-6">
+                        No rooms match the selected sharing filter.
+                      </p>
+                    );
+                  }
+
+                  return filteredRooms.map((room) => {
+                    const isSelected = selectedRoom?.id === room.id;
+                    const isFull = Number(room.available_beds) === 0;
+
+                    return (
+                      <button
+                        key={room.id}
+                        onClick={() => setSelectedRoom(room)}
+                        className={`w-full p-3.5 rounded-xl border text-left transition flex items-center justify-between ${
+                          isSelected
+                            ? 'bg-indigo-950/80 border-indigo-500 text-white shadow-md ring-1 ring-indigo-500/40'
+                            : 'bg-slate-900/60 border-slate-800/80 text-slate-300 hover:bg-slate-800/80'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-sm text-white">Room {room.room_number}</span>
+                            <span className="text-[10px] font-semibold text-indigo-400 px-2 py-0.5 bg-indigo-500/10 rounded-md border border-indigo-500/20">
+                              {formatSharing(room.room_type)}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-400 mt-1">
+                            Rent: ₹{Number(room.base_rent).toLocaleString('en-IN')}/mo
+                          </p>
+                        </div>
+
+                        <div className="text-right">
+                          {isFull ? (
+                            <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
+                              Full ({room.occupied_beds}/{room.total_beds})
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                              {room.available_beds} Vacant
+                            </span>
+                          )}
+                          <p className="text-[10px] text-slate-500 mt-1">
+                            {room.occupied_beds}/{room.total_beds} Occupied
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  });
+                })()}
               </div>
             </div>
           </div>

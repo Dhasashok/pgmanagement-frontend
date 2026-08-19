@@ -158,6 +158,7 @@ export const LoginPage = () => {
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
+                data-testid="demo-owner-btn"
                 onClick={() => quickLogin('owner')}
                 disabled={loading}
                 className="btn btn-primary text-xs py-2 px-3 justify-center rounded-xl font-bold"
@@ -166,6 +167,8 @@ export const LoginPage = () => {
               </button>
               <button
                 type="button"
+                data-testid="demo-tenant-btn"
+                aria-label="Sign In as Tenant"
                 onClick={() => quickLogin('tenant')}
                 disabled={loading}
                 className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold border border-slate-700 transition"

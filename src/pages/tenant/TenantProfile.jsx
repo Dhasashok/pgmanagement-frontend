@@ -247,7 +247,16 @@ export const TenantProfile = () => {
 
         {/* Occupation & Education Details */}
         <div>
-          <h3 className="text-xs font-extrabold uppercase tracking-wider text-indigo-400 mb-3">Occupation Details</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-extrabold uppercase tracking-wider text-indigo-400">Occupation Details</h3>
+            <Link
+              to="/tenant/announcements"
+              className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-800 hover:bg-slate-700 text-teal-300 rounded-lg text-xs font-bold transition border border-slate-700"
+            >
+              <Megaphone className="w-3.5 h-3.5 text-teal-400" />
+              <span>Announcements & Noticeboard</span>
+            </Link>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
             <div className="p-4 rounded-2xl bg-slate-800/50 border border-slate-800 flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
