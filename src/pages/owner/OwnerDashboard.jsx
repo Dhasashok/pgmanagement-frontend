@@ -1,29 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Users,
   BedDouble,
-  DollarSign,
-  AlertCircle,
+  Receipt,
+  ShieldCheck,
   CheckCircle,
   Clock,
-  TrendingUp,
   ArrowRight,
-  BellRing,
   MessageSquare,
   Sparkles,
-  Plus,
   ChevronRight,
-  ShieldCheck,
-  Receipt,
-  Wrench,
-  Megaphone,
-  ArrowUpRight,
-  Percent
+  AlertCircle
 } from 'lucide-react';
-import { StatCard } from '../../components/common/StatCard';
-import { Badge } from '../../components/common/Badge';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -66,7 +56,7 @@ export const OwnerDashboard = () => {
     load();
   }, []);
 
-  if (loading) return <LoadingSpinner label="Loading executive dashboard..." />;
+  if (loading) return <LoadingSpinner label="Loading dashboard..." />;
 
   const fmt = (v) => `₹${Number(v || 0).toLocaleString('en-IN')}`;
   const today = new Date().toLocaleDateString('en-IN', {
@@ -101,144 +91,127 @@ export const OwnerDashboard = () => {
   const roundedCollection = Math.round(Number(summary?.collection_rate) || 0);
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Top Greeting & Quick Actions Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+    <div className="space-y-4 sm:space-y-5 max-w-6xl mx-auto">
+      {/* Top Greeting Header (Clean, no redundant buttons) */}
+      <div className="flex items-center justify-between pt-1">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-lg sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-              Hello, {user?.name?.split(' ')[0] || 'Owner'}
-              <span className="inline-block animate-wave origin-[70%_70%]">👋</span>
-            </h1>
-            <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              <Sparkles className="w-3 h-3" /> Live Operations
-            </span>
-          </div>
-          <p className="text-xs text-slate-400 mt-0.5">{today} &bull; Royal Orchid PG Overview</p>
+          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+            Hello, {user?.name?.split(' ')[0] || 'Rajesh'}
+            <span className="inline-block animate-wave origin-[70%_70%]">👋</span>
+          </h1>
+          <p className="text-xs text-slate-400 mt-0.5">
+            {today} &bull; Royal Orchid PG
+          </p>
         </div>
 
-        {/* Quick Action Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-          <button
-            onClick={() => navigate('/owner/tenants')}
-            className="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 shrink-0 active:scale-95"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Add Resident</span>
-          </button>
-          <button
-            onClick={() => navigate('/owner/rooms-availability')}
-            className="px-3.5 py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 active:scale-95"
-          >
-            <BedDouble className="w-3.5 h-3.5 text-teal-400" />
-            <span>Bed Matrix</span>
-          </button>
-          <button
-            onClick={() => navigate('/owner/rent-management')}
-            className="px-3.5 py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 active:scale-95"
-          >
-            <Receipt className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Collect Rent</span>
-          </button>
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span>Operational</span>
         </div>
       </div>
 
-      {/* EXECUTIVE COMMAND HERO CARD (Mobile-First High Impact) */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-indigo-950/70 border border-slate-800/80 p-4 sm:p-6 shadow-2xl shadow-slate-950/50">
+      {/* UNIFIED EXECUTIVE SNAPSHOT CARD */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-indigo-950/60 border border-slate-800/80 p-4 sm:p-6 shadow-2xl shadow-slate-950/50">
         {/* Subtle Ambient Mesh Glow */}
-        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col gap-4">
-          {/* Header Row of Hero */}
+        <div className="relative z-10 space-y-4">
+          {/* Snapshot Header */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
-                Monthly Performance &bull; {currentMonth}
-              </span>
-            </div>
+            <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+              {currentMonth} Snapshot
+            </span>
             <button
               onClick={() => navigate('/owner/financial-dashboard')}
               className="text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition"
             >
-              <span>Full Analytics</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <span>Financial Reports</span>
+              <ArrowRight className="w-3 h-3" />
             </button>
           </div>
 
-          {/* Key Financial Snapshot */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-            <div>
-              <p className="text-xs font-semibold text-slate-400">Total Cleared Revenue</p>
+          {/* Primary Metrics: Revenue & Occupancy */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Revenue */}
+            <div
+              onClick={() => navigate('/owner/financial-dashboard')}
+              className="p-3.5 sm:p-4 rounded-2xl bg-slate-950/40 border border-slate-800/60 cursor-pointer hover:border-slate-700 transition"
+            >
+              <span className="text-xs font-semibold text-slate-400 block">Cleared Revenue</span>
               <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+                <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                   {fmt(summary?.monthly_revenue)}
                 </span>
-                <span className="text-xs font-bold text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                  {roundedCollection}% Collected
+                <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                  {roundedCollection}% Cleared
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Outstanding dues: <span className="font-bold text-amber-400">{fmt(summary?.pending_rent)}</span>
-              </p>
             </div>
 
-            {/* Quick Dual Progress Gauges */}
-            <div className="space-y-3 bg-slate-950/40 p-3.5 rounded-2xl border border-slate-800/60 backdrop-blur-sm">
-              {/* Occupancy Bar */}
-              <div>
-                <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="font-semibold text-slate-300 flex items-center gap-1.5">
-                    <BedDouble className="w-3.5 h-3.5 text-teal-400" /> Beds Occupancy
-                  </span>
-                  <span className="font-bold text-white">
-                    {summary?.occupied_beds || 0}/{summary?.total_beds || 0} ({roundedOccupancy}%)
-                  </span>
-                </div>
-                <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-teal-500 to-emerald-400 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min(roundedOccupancy, 100)}%` }}
-                  />
-                </div>
+            {/* Occupancy */}
+            <div
+              onClick={() => navigate('/owner/rooms-availability')}
+              className="p-3.5 sm:p-4 rounded-2xl bg-slate-950/40 border border-slate-800/60 cursor-pointer hover:border-slate-700 transition"
+            >
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="font-semibold text-slate-400">Bed Occupancy</span>
+                <span className="text-[11px] font-bold text-teal-300 bg-teal-500/15 px-2 py-0.5 rounded-full border border-teal-500/20">
+                  {summary?.available_beds || 0} Vacant
+                </span>
               </div>
+              <p className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
+                {summary?.occupied_beds || 0} <span className="text-sm font-semibold text-slate-400">/ {summary?.total_beds || 0} Beds ({roundedOccupancy}%)</span>
+              </p>
+            </div>
+          </div>
 
-              {/* Collection Bar */}
+          {/* Secondary Quick Metrics Row */}
+          <div className="grid grid-cols-2 gap-3 pt-1 border-t border-slate-800/60">
+            <div
+              onClick={() => navigate('/owner/rent-management')}
+              className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-amber-500/40 transition cursor-pointer"
+            >
               <div>
-                <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="font-semibold text-slate-300 flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5 text-indigo-400" /> Rent Efficiency
-                  </span>
-                  <span className="font-bold text-white">{roundedCollection}% Cleared</span>
-                </div>
-                <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-indigo-500 to-purple-400 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min(roundedCollection, 100)}%` }}
-                  />
-                </div>
+                <span className="text-[10px] text-slate-400 block">Outstanding Dues</span>
+                <span className="text-xs sm:text-sm font-black text-amber-400">
+                  {fmt(summary?.pending_rent)}
+                </span>
               </div>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+            </div>
+
+            <div
+              onClick={() => navigate('/owner/tenants')}
+              className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-indigo-500/40 transition cursor-pointer"
+            >
+              <div>
+                <span className="text-[10px] text-slate-400 block">Active Residents</span>
+                <span className="text-xs sm:text-sm font-black text-indigo-300">
+                  {summary?.active_tenants || 0} Tenants
+                </span>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
             </div>
           </div>
         </div>
       </div>
 
-      {/* STREAMLINED URGENT DUE TODAY TRAY */}
+      {/* URGENT DUE TODAY FOLLOW-UP TRAY (Only rendered when unpaid dues exist today) */}
       {validDueTenants.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           className="rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-600/5 to-transparent border border-amber-500/30 p-3.5 sm:p-4 shadow-lg"
         >
-          <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center justify-between gap-2 mb-2.5">
             <div className="flex items-center gap-2">
               <span className="flex h-2.5 w-2.5 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" />
               </span>
               <h2 className="text-xs sm:text-sm font-bold text-amber-200">
-                Action Required: {validDueTenants.length} Rent Due Today ({fmt(totalReceivableToday)})
+                Rent Due Today &bull; {validDueTenants.length} Resident(s) ({fmt(totalReceivableToday)})
               </h2>
             </div>
             <button
@@ -250,13 +223,12 @@ export const OwnerDashboard = () => {
             </button>
           </div>
 
-          {/* Swipeable / Scrollable Horizontal Resident Dues */}
           <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
             {validDueTenants.map((t) => (
               <div
                 key={t.record_id}
                 onClick={() => navigate('/owner/rent-management')}
-                className="min-w-[260px] sm:min-w-0 flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-slate-900/90 border border-amber-500/20 hover:border-amber-500/40 transition cursor-pointer shrink-0"
+                className="min-w-[260px] sm:min-w-0 flex items-center justify-between p-2.5 rounded-xl bg-slate-900/90 border border-amber-500/20 hover:border-amber-500/40 transition cursor-pointer shrink-0"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   {t.profile_photo_url ? (
@@ -297,43 +269,7 @@ export const OwnerDashboard = () => {
         </motion.div>
       )}
 
-      {/* 4-CARD BENTO KPI GRID */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-        <StatCard
-          title="Monthly Revenue"
-          value={fmt(summary?.monthly_revenue)}
-          subtitle="Cleared this month"
-          icon={DollarSign}
-          color="emerald"
-          onClick={() => navigate('/owner/financial-dashboard')}
-        />
-        <StatCard
-          title="Pending Dues"
-          value={fmt(summary?.pending_rent)}
-          subtitle="Outstanding receivables"
-          icon={AlertCircle}
-          color="amber"
-          onClick={() => navigate('/owner/rent-management')}
-        />
-        <StatCard
-          title="Active Residents"
-          value={summary?.active_tenants || 0}
-          subtitle="Checked-in tenants"
-          icon={Users}
-          color="indigo"
-          onClick={() => navigate('/owner/tenants')}
-        />
-        <StatCard
-          title="Vacant Beds"
-          value={summary?.available_beds || 0}
-          subtitle="Ready for allocation"
-          icon={BedDouble}
-          color="teal"
-          onClick={() => navigate('/owner/rooms-availability')}
-        />
-      </div>
-
-      {/* ACTIVITY HUB: MOBILE SEGMENTED TABS & DESKTOP DUAL COLUMN */}
+      {/* LIVE ACTIVITY FEED (Recent Payments & Verification Proofs) */}
       <div className="space-y-3">
         {/* Mobile Tab Switcher */}
         <div className="flex sm:hidden p-1 bg-slate-900/90 border border-slate-800 rounded-xl">
@@ -364,18 +300,18 @@ export const OwnerDashboard = () => {
           </button>
         </div>
 
-        {/* Dual Grid for Tablet/Desktop, Tabbed for Mobile */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Responsive Dual Grid on Desktop, Tabbed on Mobile */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
           {/* Recent Cleared Payments */}
           <div
             className={`bg-slate-900/80 border border-slate-800 rounded-2xl shadow-xl overflow-hidden ${
               activeMobileTab !== 'payments' ? 'hidden sm:block' : ''
             }`}
           >
-            <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-800/80 bg-slate-950/30">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/80 bg-slate-950/30">
               <div className="flex items-center gap-2">
                 <Receipt className="w-4 h-4 text-emerald-400" />
-                <h2 className="text-xs sm:text-sm font-bold text-white">Recent Cleared Payments</h2>
+                <h2 className="text-xs sm:text-sm font-bold text-white">Recent Payments</h2>
               </div>
               <button
                 onClick={() => navigate('/owner/payment-verification')}
@@ -387,16 +323,16 @@ export const OwnerDashboard = () => {
 
             <div className="divide-y divide-slate-800/60">
               {recentPayments.length === 0 ? (
-                <div className="text-center py-8 text-slate-400 text-xs">No recent payments logged</div>
+                <div className="text-center py-6 text-slate-400 text-xs">No recent payments logged</div>
               ) : (
                 recentPayments.map((pay) => (
                   <div
                     key={pay.id}
                     onClick={() => navigate('/owner/rent-management')}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-slate-800/30 transition cursor-pointer active:bg-slate-800/50"
+                    className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-800/30 transition cursor-pointer active:bg-slate-800/50"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 shrink-0 border border-emerald-500/20 font-bold text-xs">
+                      <div className="w-7 h-7 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 shrink-0 border border-emerald-500/20 font-bold text-xs">
                         ₹
                       </div>
                       <div className="min-w-0">
@@ -429,13 +365,13 @@ export const OwnerDashboard = () => {
               activeMobileTab !== 'proofs' ? 'hidden sm:block' : ''
             }`}
           >
-            <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-800/80 bg-slate-950/30">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/80 bg-slate-950/30">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-amber-400" />
-                <h2 className="text-xs sm:text-sm font-bold text-white">Pending Proofs</h2>
+                <h2 className="text-xs sm:text-sm font-bold text-white">Pending Verification</h2>
                 {pendingProofs.length > 0 && (
                   <span className="px-2 py-0.5 bg-amber-500 text-slate-950 text-[10px] font-extrabold rounded-full">
-                    {pendingProofs.length} Pending
+                    {pendingProofs.length} New
                   </span>
                 )}
               </div>
@@ -449,7 +385,7 @@ export const OwnerDashboard = () => {
 
             <div className="divide-y divide-slate-800/60">
               {pendingProofs.length === 0 ? (
-                <div className="flex items-center justify-center gap-2 py-8 text-emerald-400">
+                <div className="flex items-center justify-center gap-2 py-6 text-emerald-400">
                   <CheckCircle className="w-4 h-4" />
                   <p className="text-xs font-semibold">All online proofs verified!</p>
                 </div>
@@ -458,11 +394,11 @@ export const OwnerDashboard = () => {
                   <div
                     key={proof.id}
                     onClick={() => navigate('/owner/payment-verification')}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-slate-800/30 transition cursor-pointer active:bg-slate-800/50"
+                    className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-800/30 transition cursor-pointer active:bg-slate-800/50"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 shrink-0 border border-amber-500/20">
-                        <Clock className="w-4 h-4" />
+                      <div className="w-7 h-7 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 shrink-0 border border-amber-500/20">
+                        <Clock className="w-3.5 h-3.5" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-semibold text-white truncate">{proof.tenant_name}</p>
@@ -482,52 +418,6 @@ export const OwnerDashboard = () => {
               )}
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* QUICK LAUNCH GRID (Compact Thumb-friendly) */}
-      <div className="bg-slate-900/70 border border-slate-800/80 rounded-2xl p-4 shadow-xl">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
-          Quick Management
-        </h2>
-        <div className="grid grid-cols-4 gap-2 sm:gap-3">
-          {[
-            {
-              label: 'Residents',
-              icon: Users,
-              path: '/owner/tenants',
-              bg: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/20'
-            },
-            {
-              label: 'Bed Matrix',
-              icon: BedDouble,
-              path: '/owner/rooms-availability',
-              bg: 'bg-teal-500/10 text-teal-400 border-teal-500/20 hover:bg-teal-500/20'
-            },
-            {
-              label: 'Rent Register',
-              icon: Receipt,
-              path: '/owner/rent-management',
-              bg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
-            },
-            {
-              label: 'Tickets',
-              icon: Wrench,
-              path: '/owner/complaints',
-              bg: 'bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20'
-            }
-          ].map(({ label, icon: Icon, path, bg }) => (
-            <button
-              key={path}
-              onClick={() => navigate(path)}
-              className={`flex flex-col items-center justify-center gap-1.5 p-2.5 sm:p-3.5 rounded-xl border ${bg} transition active:scale-95 text-center`}
-            >
-              <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="text-[10px] sm:text-xs font-semibold text-slate-200 truncate w-full">
-                {label}
-              </span>
-            </button>
-          ))}
         </div>
       </div>
     </div>
