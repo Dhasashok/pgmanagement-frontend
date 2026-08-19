@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BedDouble, Mail, Lock, ArrowRight, Eye, EyeOff, Zap } from 'lucide-react';
+import { BedDouble, Mail, Lock, ArrowRight, ArrowLeft, Eye, EyeOff, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 
@@ -59,6 +59,17 @@ export const LoginPage = () => {
 
   return (
     <div className="login-page min-h-screen flex bg-slate-950">
+      {/* Top Left Floating Back to Home button for desktop & mobile */}
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-semibold backdrop-blur transition shadow-md"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to Home</span>
+        </Link>
+      </div>
+
       {/* Left: Hero Panel */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-slate-950 border-r border-slate-800/80">
         {/* Subtle Radial Ambient Glows */}
@@ -66,7 +77,7 @@ export const LoginPage = () => {
         <div className="absolute top-1/2 -right-32 w-96 h-96 bg-teal-500/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-32 left-1/4 w-80 h-80 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+        <div className="relative z-10 flex flex-col justify-between p-12 w-full pt-20">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-indigo-600/20 border border-indigo-500/30 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-950/50">
               <BedDouble className="w-5 h-5 text-indigo-400" />
@@ -113,7 +124,7 @@ export const LoginPage = () => {
       </div>
 
       {/* Right: Login Form */}
-      <div className="flex-1 flex items-center justify-center p-6 bg-slate-950 relative overflow-hidden">
+      <div className="flex-1 flex items-center justify-center p-6 bg-slate-950 relative overflow-hidden pt-16 sm:pt-6">
         <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-indigo-600/15 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-teal-500/10 blur-3xl pointer-events-none" />
         <motion.div
@@ -121,12 +132,17 @@ export const LoginPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-sm space-y-6 glass-panel bg-slate-900/90 border border-slate-800 rounded-3xl shadow-2xl p-6 sm:p-8 relative z-10"
         >
-          {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center gap-2 justify-center mb-2">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-              <BedDouble className="w-5 h-5" />
+          {/* Mobile Logo & Back */}
+          <div className="flex items-center justify-between lg:hidden mb-2">
+            <Link to="/" className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-white transition">
+              <ArrowLeft className="w-3.5 h-3.5" /> Home
+            </Link>
+            <div className="flex items-center gap-1.5">
+              <div className="w-7 h-7 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                <BedDouble className="w-4 h-4" />
+              </div>
+              <span className="font-bold text-white text-xs">Royal Orchid</span>
             </div>
-            <span className="font-bold text-white text-base">Royal Orchid PG</span>
           </div>
 
           <div>
