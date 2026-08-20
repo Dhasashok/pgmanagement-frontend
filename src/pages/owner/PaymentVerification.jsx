@@ -38,19 +38,20 @@ export const PaymentVerification = () => {
   const fetchProofs = async () => {
     try {
       setLoading(true);
+      const cacheBuster = Date.now();
       if (statusFilter === 'audit_logs') {
-        const auditRes = await api.get('/payments/audit-logs');
+        const auditRes = await api.get(`/payments/audit-logs?_t=${cacheBuster}`);
         if (auditRes.success) {
           setAuditLogs(auditRes.logs || []);
         }
       } else {
-        const res = await api.get(`/payments/proofs?status=${statusFilter}`);
+        const res = await api.get(`/payments/proofs?status=${statusFilter}&_t=${cacheBuster}`);
         if (res.success) {
           setProofs(res.proofs || []);
         }
       }
     } catch (err) {
-      showError('Failed to fetch verification requests');
+      showError(err.message || 'Failed to fetch verification requests');
     } finally {
       setLoading(false);
     }
@@ -94,24 +95,26 @@ export const PaymentVerification = () => {
   const handleReject = async () => {
     if (!selectedProofForReject) return;
     const proofId = selectedProofForReject.id;
+    const reason = (rejectionReason || '').trim() || 'Transaction ID or screenshot does not match bank deposit records.';
     setProcessing(true);
     try {
       const res = await api.post(`/payments/proofs/${proofId}/verify`, {
         action: 'reject',
-        rejection_reason: rejectionReason
+        rejection_reason: reason
       });
       if (res.success) {
         // Optimistically remove card from local state immediately
         setProofs(prev => prev.filter(p => p.id !== proofId));
         setRejectModalOpen(false);
         setPreviewProof(null);
+        setSelectedProofForReject(null);
         showSuccess('Payment proof rejected and marked in resident portal.');
         await fetchProofs();
       } else {
         showError(res.message || 'Rejection failed');
       }
     } catch (err) {
-      showError(err.message || 'Rejection failed');
+      showError(err.message || 'Rejection failed. Please check server connection.');
     } finally {
       setProcessing(false);
     }
