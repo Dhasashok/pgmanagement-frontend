@@ -1,9 +1,15 @@
 import axios from 'axios';
 
-const isProduction = import.meta.env.PROD || (typeof window !== 'undefined' && (window.location.hostname.includes('netlify.app') || window.location.hostname.includes('vercel.app')));
+const isVercelOrNetlify = typeof window !== 'undefined' && (
+  window.location.hostname.includes('vercel.app') || 
+  window.location.hostname.includes('netlify.app')
+);
 
-// Auto-normalize API_BASE so it ALWAYS has the /api prefix even if the environment variable omits it
-let rawBase = import.meta.env.VITE_API_URL || (isProduction ? 'https://pgmanagement-backend-uez9.onrender.com/api' : '/api');
+// If on Vercel/Netlify, use the relative /api proxy rewrite from vercel.json / netlify to prevent browser CORS blocks
+let rawBase = isVercelOrNetlify 
+  ? '/api' 
+  : (import.meta.env.VITE_API_URL || '/api');
+
 if (rawBase && !rawBase.endsWith('/api') && !rawBase.endsWith('/api/')) {
   rawBase = rawBase.replace(/\/+$/, '') + '/api';
 }
@@ -11,7 +17,7 @@ const API_BASE = rawBase;
 
 const api = axios.create({
   baseURL: API_BASE,
-  timeout: 25000,
+  timeout: 30000,
 });
 
 // Request interceptor to attach JWT
